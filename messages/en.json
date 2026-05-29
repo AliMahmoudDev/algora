@@ -1,0 +1,203 @@
+{
+  "Navbar": {
+    "home": "Home",
+    "problems": "Problems",
+    "features": "Features",
+    "about": "About",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "profile": "Profile",
+    "signOut": "Sign Out",
+    "dashboard": "Dashboard",
+    "mobileMenu": "Toggle menu"
+  },
+  "HeroSection": {
+    "badge": "Now with AI-Powered Assistance",
+    "title1": "Master Algorithms.",
+    "title2": "Code the Future.",
+    "description": "A bilingual learning platform for algorithms and problem-solving. Available in Arabic & English with AI-powered guidance.",
+    "startSolving": "Start Solving",
+    "viewProblems": "View Problems",
+    "problems": "Problems",
+    "languages": "Languages",
+    "powered": "AI",
+    "andGrowing": "And Growing",
+    "supported": "Supported",
+    "poweredAssistant": "Powered Assistant",
+    "smartExplanations": "Smart Explanations",
+    "alwaysAvailable": "Always Available",
+    "learnAnytime": "Learn Anytime"
+  },
+  "FeaturesSection": {
+    "badge": "Features",
+    "title": "Everything You Need to",
+    "titleHighlight": "Succeed",
+    "description": "Our platform combines cutting-edge AI, bilingual support, and professional tools to give you the best algorithmic learning experience.",
+    "aiAssistant": {
+      "title": "AI-Powered Assistant",
+      "description": "Get step-by-step algorithm explanations from our AI chatbot. Understand complex concepts through interactive dialogue."
+    },
+    "bilingual": {
+      "title": "Bilingual Learning",
+      "description": "Full Arabic and English support with RTL layout. Learn algorithms in the language you are most comfortable with."
+    },
+    "editor": {
+      "title": "Real Code Editor",
+      "description": "Write, run, and debug code in a Monaco-style editor. Support for multiple languages with real-time execution."
+    }
+  },
+  "StatsSection": {
+    "algorithmicProblems": "Algorithmic Problems",
+    "languagesSupported": "Languages Supported",
+    "smartExplanations": "Smart Explanations",
+    "learnAnytime": "Learn Anytime",
+    "andGrowing": "And Growing",
+    "arabicEnglish": "Arabic + English",
+    "poweredAssistant": "Powered Assistant",
+    "alwaysAvailable": "Always Available"
+  },
+  "ProblemsSection": {
+    "badge": "Problems",
+    "title": "Practice Real",
+    "titleHighlight": "Challenges",
+    "description": "Browse through our curated collection of algorithmic problems, each with detailed explanations available in both Arabic and English.",
+    "viewAll": "View all 50+ problems"
+  },
+  "HowItWorksSection": {
+    "badge": "How It Works",
+    "title": "Start Learning in",
+    "titleHighlight": "3 Steps",
+    "description": "Our streamlined process gets you from problem selection to solution mastery as quickly as possible.",
+    "step1": {
+      "title": "Choose a Problem",
+      "description": "Browse our curated library of algorithmic challenges. Filter by difficulty, topic, or language preference."
+    },
+    "step2": {
+      "title": "Write Your Solution",
+      "description": "Use our integrated code editor to write your solution in your preferred programming language. Run tests instantly."
+    },
+    "step3": {
+      "title": "Get AI Feedback",
+      "description": "Receive detailed, personalized feedback from our AI assistant. Get hints, explanations, and optimization suggestions."
+    }
+  },
+  "CTASection": {
+    "title": "Ready to Start Your",
+    "titleHighlight": "Journey",
+    "description": "Join hundreds of learners mastering algorithms with AI-powered guidance. Available in Arabic and English, 24/7.",
+    "getStarted": "Get Started — It's Free",
+    "noCreditCard": "No credit card required · Free forever · Start solving in seconds"
+  },
+  "Footer": {
+    "platform": "Platform",
+    "resources": "Resources",
+    "company": "Company",
+    "problems": "Problems",
+    "features": "Features",
+    "pricing": "Pricing",
+    "documentation": "Documentation",
+    "blog": "Blog",
+    "community": "Community",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "description": "A bilingual algorithms education platform with AI-powered learning assistance.",
+    "copyright": "© 2026 Algora. All rights reserved.",
+    "builtWith": "Built with"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue your learning journey",
+      "email": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign Up",
+      "orContinueWith": "Or continue with",
+      "github": "Sign in with GitHub",
+      "google": "Sign in with Google",
+      "errors": {
+        "invalidEmail": "Please enter a valid email address",
+        "passwordRequired": "Password is required",
+        "passwordMinLength": "Password must be at least 6 characters",
+        "invalidCredentials": "Invalid email or password"
+      }
+    },
+    "signUp": {
+      "title": "Create Your Account",
+      "subtitle": "Start your algorithmic journey today",
+      "name": "Full Name",
+      "namePlaceholder": "Your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Create a strong password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign In",
+      "orContinueWith": "Or continue with",
+      "github": "Sign up with GitHub",
+      "google": "Sign up with Google",
+      "errors": {
+        "nameRequired": "Name is required",
+        "invalidEmail": "Please enter a valid email address",
+        "passwordRequired": "Password is required",
+        "passwordMinLength": "Password must be at least 6 characters",
+        "passwordMismatch": "Passwords do not match"
+      }
+    }
+  },
+  "Problems": {
+    "title": "Problem Set",
+    "subtitle": "Sharpen your skills with curated algorithmic challenges",
+    "search": "Search problems...",
+    "filters": "Filters",
+    "difficulty": "Difficulty",
+    "category": "Category",
+    "status": "Status",
+    "sort": "Sort by",
+    "all": "All",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "notStarted": "Not Started",
+    "solved": "Solved",
+    "attempted": "Attempted",
+    "acceptanceRate": "Acceptance Rate",
+    "title": "Title",
+    "acceptance": "Acceptance",
+    "clearFilters": "Clear Filters",
+    "noResults": "No problems found matching your criteria",
+    "showing": "Showing",
+    "of": "of",
+    "problems": "problems",
+    "problem": "Problem",
+    "difficultyLabel": "Difficulty",
+    "categoryLabel": "Category",
+    "acceptanceLabel": "Acceptance"
+  },
+  "ProblemView": {
+    "description": "Description",
+    "editor": "Editor",
+    "runCode": "Run Code",
+    "submit": "Submit",
+    "console": "Console",
+    "selectLanguage": "Select Language",
+    "examples": "Examples",
+    "constraints": "Constraints",
+    "relatedTags": "Related Tags",
+    "input": "Input",
+    "output": "Output",
+    "explanation": "Explanation",
+    "noOutput": "No output yet. Run your code to see results.",
+    "submitSuccess": "All test cases passed! ✓",
+    "submitFail": "Some test cases failed. Try again.",
+    "runtime": "Runtime",
+    "memory": "Memory"
+  }
+}

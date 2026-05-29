@@ -2,18 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Code2 } from 'lucide-react';
-
-const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'Problems', href: '#problems' },
-  { label: 'Features', href: '#features' },
-  { label: 'About', href: '#how-it-works' },
-];
+import { Menu, X, Globe } from 'lucide-react';
+import Image from 'next/image';
+import { useLocale, useTranslations } from 'next-intl';
+import { usePathname, useRouter } from 'next/navigation';
+import { routing, type Locale } from '@/i18n/routing';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const locale = useLocale() as Locale;
+  const t = useTranslations('Navbar');
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +23,21 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const switchLocale = () => {
+    const nextLocale = locale === 'en' ? 'ar' : 'en';
+    // Replace the current locale segment in the path
+    const segments = pathname.split('/');
+    segments[1] = nextLocale;
+    router.push(segments.join('/'));
+  };
+
+  const navLinks = [
+    { label: t('home'), href: `#${locale}` },
+    { label: t('problems'), href: '#problems' },
+    { label: t('features'), href: '#features' },
+    { label: t('about'), href: '#how-it-works' },
+  ];
 
   return (
     <nav
@@ -34,10 +50,14 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="#home" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-algora-gold/10 flex items-center justify-center group-hover:bg-algora-gold/20 transition-colors">
-              <Code2 className="w-5 h-5 text-algora-gold" />
-            </div>
+          <a href={`#${locale}`} className="flex items-center gap-2.5 group">
+            <Image
+              src="/algora_logo.png"
+              alt="Algora"
+              width={32}
+              height={32}
+              className="rounded-lg group-hover:brightness-110 transition-all"
+            />
             <span className="text-xl font-bold tracking-tight text-algora-text-primary">
               Algora
             </span>
@@ -55,10 +75,22 @@ export default function Navbar() {
               </a>
             ))}
             <Button
+              variant="ghost"
+              size="sm"
+              onClick={switchLocale}
+              className="text-algora-text-muted hover:text-algora-gold hover:bg-algora-card-bg rounded-lg px-3"
+            >
+              <Globe className="w-4 h-4 me-2" />
+              {locale === 'en' ? 'العربية' : 'English'}
+            </Button>
+            <Button
               className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold gold-glow rounded-lg"
               size="sm"
+              asChild
             >
-              Sign In
+              <a href={`/${locale}/auth/signin`}>
+                {t('signIn')}
+              </a>
             </Button>
           </div>
 
@@ -66,7 +98,7 @@ export default function Navbar() {
           <button
             className="md:hidden text-algora-text-muted hover:text-algora-text-primary transition-colors"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            aria-label="Toggle menu"
+            aria-label={t('mobileMenu')}
           >
             {isMobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -87,11 +119,25 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
+            <div className="flex items-center gap-3 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={switchLocale}
+                className="flex-1 text-algora-text-muted hover:text-algora-gold hover:bg-algora-card-bg rounded-lg"
+              >
+                <Globe className="w-4 h-4 me-2" />
+                {locale === 'en' ? 'العربية' : 'English'}
+              </Button>
+            </div>
             <Button
               className="w-full bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold rounded-lg"
               size="sm"
+              asChild
             >
-              Sign In
+              <a href={`/${locale}/auth/signin`}>
+                {t('signIn')}
+              </a>
             </Button>
           </div>
         </div>

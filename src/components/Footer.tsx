@@ -1,4 +1,4 @@
-import { Code2 } from 'lucide-react';
+import Image from 'next/image';
 
 const footerLinks = [
   {
@@ -37,10 +37,14 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <a href="#home" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-algora-gold/10 flex items-center justify-center">
-                <Code2 className="w-5 h-5 text-algora-gold" />
-              </div>
+            <a href="#home" className="flex items-center gap-2.5 mb-4">
+              <Image
+                src="/algora_logo.png"
+                alt="Algora"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
               <span className="text-xl font-bold text-algora-text-primary">
                 Algora
               </span>

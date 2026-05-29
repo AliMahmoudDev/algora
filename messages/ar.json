@@ -1,0 +1,203 @@
+{
+  "Navbar": {
+    "home": "الرئيسية",
+    "problems": "المسائل",
+    "features": "المميزات",
+    "about": "عن المنصة",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "profile": "الملف الشخصي",
+    "signOut": "تسجيل الخروج",
+    "dashboard": "لوحة التحكم",
+    "mobileMenu": "القائمة"
+  },
+  "HeroSection": {
+    "badge": "الآن مع مساعدة الذكاء الاصطناعي",
+    "title1": "أتقن الخوارزميات.",
+    "title2": "اصنع المستقبل.",
+    "description": "منصة تعليمية ثنائية اللغة للخوارزميات وحل المشكلات. متاحة بالعربية والإنجليزية مع إرشاد مدعوم بالذكاء الاصطناعي.",
+    "startSolving": "ابدأ الحل",
+    "viewProblems": "تصفح المسائل",
+    "problems": "مسألة",
+    "languages": "لغات",
+    "powered": "ذكاء اصطناعي",
+    "andGrowing": "في تزايد مستمر",
+    "supported": "مدعومة",
+    "poweredAssistant": "مساعد ذكي",
+    "smartExplanations": "شروحات ذكية",
+    "alwaysAvailable": "متاح دائماً",
+    "learnAnytime": "تعلم في أي وقت"
+  },
+  "FeaturesSection": {
+    "badge": "المميزات",
+    "title": "كل ما تحتاجه",
+    "titleHighlight": "للنجاح",
+    "description": "تجمع منصتنا بين الذكاء الاصطناعي المتطور والدعم ثنائي اللغة والأدوات الاحترافية لتمنحك أفضل تجربة تعليمية للخوارزميات.",
+    "aiAssistant": {
+      "title": "مساعد بالذكاء الاصطناعي",
+      "description": "احصل على شروحات خطوة بخطوة للخوارزميات من روبوت الدردشة الذكي. افهم المفاهيم المعقدة من خلال حوار تفاعلي."
+    },
+    "bilingual": {
+      "title": "تعليم ثنائي اللغة",
+      "description": "دعم كامل للعربية والإنجليزية مع تخطيط RTL. تعلم الخوارزميات باللغة التي تشعر بالراحة معها."
+    },
+    "editor": {
+      "title": "محرر أكواد حقيقي",
+      "description": "اكتب وشغّل واصحح أخطاء أكوادك في محرر على طراز Monaco. دعم لعدة لغات مع تنفيذ فوري."
+    }
+  },
+  "StatsSection": {
+    "algorithmicProblems": "مسألة خوارزمية",
+    "languagesSupported": "لغات مدعومة",
+    "smartExplanations": "شروحات ذكية",
+    "learnAnytime": "تعلم في أي وقت",
+    "andGrowing": "في تزايد مستمر",
+    "arabicEnglish": "العربية + الإنجليزية",
+    "poweredAssistant": "مساعد ذكي",
+    "alwaysAvailable": "متاح دائماً"
+  },
+  "ProblemsSection": {
+    "badge": "المسائل",
+    "title": "تحدّيات حقيقية",
+    "titleHighlight": "للتدريب",
+    "description": "تصفح مجموعتنا المختارة من المسائل الخوارزمية، كل منها مع شروحات مفصلة متاحة بالعربية والإنجليزية.",
+    "viewAll": "عرض جميع المسائل 50+"
+  },
+  "HowItWorksSection": {
+    "badge": "كيف تعمل",
+    "title": "ابدأ التعلم في",
+    "titleHighlight": "3 خطوات",
+    "description": "عمليتنا المبسطة تنقلك من اختيار المسألة إلى إتقان الحل بأسرع وقت ممكن.",
+    "step1": {
+      "title": "اختر مسألة",
+      "description": "تصفح مكتبتنا المختارة من التحديات الخوارزمية. فلتر حسب الصعوبة أو الموضوع أو تفضيل اللغة."
+    },
+    "step2": {
+      "title": "اكتب حلّك",
+      "description": "استخدم محرر الأكواد المتكامل لكتابة حلّك بلغتك البرمجية المفضلة. شغّل الاختبارات فوراً."
+    },
+    "step3": {
+      "title": "احصل على تقييم ذكي",
+      "description": "استقبل ملاحظات مفصلة وشخصية من مساعدنا الذكي. احصل على تلميحات وشروحات واقتراحات تحسين."
+    }
+  },
+  "CTASection": {
+    "title": "مستعد لبدء",
+    "titleHighlight": "رحلتك؟",
+    "description": "انضم لمئات المتعلمين الذين يتقنون الخوارزميات بإرشاد الذكاء الاصطناعي. متاح بالعربية والإنجليزية، على مدار الساعة.",
+    "getStarted": "ابدأ الآن — مجاناً",
+    "noCreditCard": "لا حاجة لبطاقة ائتمان · مجاني للأبد · ابدأ الحل في ثوانٍ"
+  },
+  "Footer": {
+    "platform": "المنصة",
+    "resources": "المصادر",
+    "company": "الشركة",
+    "problems": "المسائل",
+    "features": "المميزات",
+    "pricing": "الأسعار",
+    "documentation": "التوثيق",
+    "blog": "المدوّنة",
+    "community": "المجتمع",
+    "about": "عن المنصة",
+    "contact": "اتصل بنا",
+    "privacy": "الخصوصية",
+    "description": "منصة تعليمية ثنائية اللغة للخوارزميات مع مساعدة تعليمية مدعومة بالذكاء الاصطناعي.",
+    "copyright": "© 2026 ألغورا. جميع الحقوق محفوظة.",
+    "builtWith": "بُنيت بـ"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "مرحباً بعودتك",
+      "subtitle": "سجّل الدخول لمتابعة رحلة التعلم الخاصة بك",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "noAccount": "ليس لديك حساب؟",
+      "signUpLink": "إنشاء حساب",
+      "orContinueWith": "أو تابع باستخدام",
+      "github": "تسجيل الدخول بواسطة GitHub",
+      "google": "تسجيل الدخول بواسطة Google",
+      "errors": {
+        "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+        "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+      }
+    },
+    "signUp": {
+      "title": "أنشئ حسابك",
+      "subtitle": "ابدأ رحلتك الخوارزمية اليوم",
+      "name": "الاسم الكامل",
+      "namePlaceholder": "اسمك الكامل",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "أنشئ كلمة مرور قوية",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "أكد كلمة المرور",
+      "submit": "إنشاء حساب",
+      "hasAccount": "لديك حساب بالفعل؟",
+      "signInLink": "تسجيل الدخول",
+      "orContinueWith": "أو تابع باستخدام",
+      "github": "إنشاء حساب بواسطة GitHub",
+      "google": "إنشاء حساب بواسطة Google",
+      "errors": {
+        "nameRequired": "الاسم مطلوب",
+        "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+        "passwordMismatch": "كلمات المرور غير متطابقة"
+      }
+    }
+  },
+  "Problems": {
+    "title": "مجموعة المسائل",
+    "subtitle": "صقل مهاراتك مع تحديات خوارزمية مختارة",
+    "search": "ابحث في المسائل...",
+    "filters": "الفلترة",
+    "difficulty": "الصعوبة",
+    "category": "التصنيف",
+    "status": "الحالة",
+    "sort": "ترتيب حسب",
+    "all": "الكل",
+    "easy": "سهل",
+    "medium": "متوسط",
+    "hard": "صعب",
+    "notStarted": "لم تبدأ",
+    "solved": "تم الحل",
+    "attempted": "تمت المحاولة",
+    "acceptanceRate": "نسبة القبول",
+    "title": "العنوان",
+    "acceptance": "القبول",
+    "clearFilters": "مسح الفلاتر",
+    "noResults": "لا توجد مسائل تطابق معاييرك",
+    "showing": "عرض",
+    "of": "من",
+    "problems": "مسائل",
+    "problem": "مسألة",
+    "difficultyLabel": "الصعوبة",
+    "categoryLabel": "التصنيف",
+    "acceptanceLabel": "القبول"
+  },
+  "ProblemView": {
+    "description": "الوصف",
+    "editor": "المحرر",
+    "runCode": "تشغيل الكود",
+    "submit": "إرسال",
+    "console": "وحدة التحكم",
+    "selectLanguage": "اختر اللغة",
+    "examples": "أمثلة",
+    "constraints": "القيود",
+    "relatedTags": "الوسوم ذات الصلة",
+    "input": "المدخل",
+    "output": "المخرج",
+    "explanation": "الشرح",
+    "noOutput": "لا يوجد مخرج بعد. شغّل الكود لرؤية النتائج.",
+    "submitSuccess": "جميع حالات الاختبار نجحت! ✓",
+    "submitFail": "بعض حالات الاختبار فشلت. حاول مرة أخرى.",
+    "runtime": "وقت التشغيل",
+    "memory": "الذاكرة"
+  }
+}

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,19 +8,75 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  submissions   Submission[]
+  userProblems  UserProblem[]
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Problem {
+  id              String   @id @default(cuid())
+  title           String
+  titleAr         String
+  slug            String   @unique
+  description     String
+  descriptionAr   String
+  difficulty      String   // "Easy", "Medium", "Hard"
+  category        String
+  tags            String   // JSON array stored as string
+  examples        String   // JSON array stored as string
+  constraints     String?
+  constraintsAr   String?
+  acceptanceRate  Float    @default(0)
+  starterCode     String?  // JSON map stored as string: { "python": "...", "javascript": "...", etc }
+  testCases       String?  // JSON array stored as string
+  hints           String?  // JSON array stored as string
+  orderIndex      Int      @default(0)
+  isPublished     Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  submissions    Submission[]
+  userProblems    UserProblem[]
+}
+
+model Submission {
+  id         String   @id @default(cuid())
+  code       String
+  language   String
+  status     String   // "Accepted", "Wrong Answer", "Time Limit Exceeded", "Runtime Error", "Compilation Error"
+  runtime    Float?
+  memory     Float?
+  testCasesPassed Int @default(0)
+  testCasesTotal   Int @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemId  String
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+}
+
+model UserProblem {
+  id           String   @id @default(cuid())
+  status       String   @default("Not Started") // "Not Started", "Attempted", "Solved"
+  attempts     Int      @default(0)
+  bestRuntime  Float?
+  bestMemory   Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemId    String
+  problem      Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
 }
