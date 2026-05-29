@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algora - Brand Identity Guidelines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@page { size: 793px 1122px; margin: 0; }
+
+:root {
+  --bg-primary: #0D0D12;
+  --bg-secondary: #161622;
+  --bg-card: #1A1A2E;
+  --accent-gold: #F59E0B;
+  --accent-gold-light: #FBBF24;
+  --accent-gold-dim: #D97706;
+  --accent-green: #10B981;
+  --accent-purple: #6366F1;
+  --accent-red: #EF4444;
+  --accent-cyan: #06B6D4;
+  --text-primary: #E2E8F0;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+  --border-subtle: rgba(255,255,255,0.08);
+  --border-accent: rgba(245,158,11,0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.poster {
+  width: 793px;
+  margin: 0 auto;
+  background: var(--bg-primary);
+  position: relative;
+}
+
+/* Sections */
+.section {
+  width: 793px;
+  min-height: 1122px;
+  padding: 56px;
+  position: relative;
+  page-break-after: always;
+  overflow: hidden;
+}
+
+.section-cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: var(--bg-primary);
+}
+
+.section-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 50% 30%, rgba(245,158,11,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgba(99,102,241,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.section-label {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.section-desc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  max-width: 580px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 28px 0;
+}
+
+.page-number {
+  position: absolute;
+  bottom: 28px;
+  right: 56px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+/* Cover */
+.cover-logo { width: 110px; height: 110px; margin-bottom: 44px; border-radius: 20px; position: relative; z-index: 1; }
+.cover-title { font-size: 68px; font-weight: 900; letter-spacing: 14px; color: var(--text-primary); margin-bottom: 14px; position: relative; z-index: 1; }
+.cover-subtitle { font-size: 13px; font-weight: 400; letter-spacing: 6px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 48px; position: relative; z-index: 1; }
+.cover-line { width: 56px; height: 2px; background: var(--accent-gold); margin-bottom: 36px; position: relative; z-index: 1; }
+.cover-meta { font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); letter-spacing: 2px; position: relative; z-index: 1; }
+.cover-meta span { display: block; margin-bottom: 6px; }
+
+/* Color Palette */
+.color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.color-card { background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-subtle); }
+.color-swatch { height: 80px; position: relative; }
+.color-swatch::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%); }
+.color-info { padding: 12px; }
+.color-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+.color-hex { font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--text-muted); }
+.color-usage { font-size: 10px; color: var(--text-dim); font-style: italic; margin-top: 2px; }
+
+.color-row-full { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 24px; }
+.color-mini { text-align: center; }
+.color-mini-swatch { width: 100%; height: 50px; border-radius: 8px; margin-bottom: 6px; border: 1px solid var(--border-subtle); }
+.color-mini-name { font-size: 10px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.color-mini-hex { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); }
+
+/* Logo */
+.logo-main-showcase { display: flex; justify-content: center; margin-bottom: 28px; }
+.logo-main-wrapper { background: var(--bg-card); border-radius: 16px; padding: 32px; text-align: center; border: 1px solid var(--border-subtle); max-width: 280px; }
+.logo-main-wrapper img { width: 140px; height: 140px; border-radius: 16px; margin-bottom: 16px; }
+.logo-main-name { font-size: 18px; font-weight: 700; }
+.logo-main-tagline { font-size: 12px; color: var(--text-muted); }
+
+.logo-showcase { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.logo-concept-card { background: var(--bg-card); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid var(--border-subtle); }
+.logo-concept-card img { width: 100%; height: auto; border-radius: 10px; margin-bottom: 12px; }
+.logo-concept-label { font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px; }
+.logo-concept-name { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.logo-concept-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+/* Typography */
+.type-section { margin-bottom: 28px; }
+.type-header { font-size: 11px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--accent-gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle); }
+.type-sample-row { display: flex; align-items: baseline; gap: 16px; margin-bottom: 10px; padding: 12px; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-subtle); }
+.type-weight-label { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); min-width: 70px; flex-shrink: 0; }
+
+/* UI Components */
+.ui-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.ui-card { background: var(--bg-card); border-radius: 14px; padding: 20px; border: 1px solid var(--border-subtle); }
+.ui-card-title { font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 14px; }
+
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.btn { padding: 8px 20px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif; }
+.btn-primary { background: var(--accent-gold); color: var(--bg-primary); }
+.btn-secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border-accent); }
+.btn-ghost { background: rgba(245,158,11,0.1); color: var(--accent-gold); }
+.btn-danger { background: var(--accent-red); color: white; }
+.btn-success { background: var(--accent-green); color: white; }
+
+.badge { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-easy { background: rgba(16,185,129,0.15); color: var(--accent-green); border: 1px solid rgba(16,185,129,0.3); }
+.badge-medium { background: rgba(245,158,11,0.15); color: var(--accent-gold); border: 1px solid rgba(245,158,11,0.3); }
+.badge-hard { background: rgba(239,68,68,0.15); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.3); }
+
+.input-demo { width: 100%; padding: 8px 14px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-size: 12px; font-family: 'Inter', sans-serif; margin-bottom: 10px; outline: none; }
+
+.progress-bar-demo { width: 100%; height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-gold-dim), var(--accent-gold)); border-radius: 3px; }
+.progress-label { font-size: 10px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+
+.stat-row { display: flex; gap: 14px; margin-bottom: 28px; }
+.stat-box { flex: 1; background: var(--bg-card); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-subtle); }
+.stat-number { font-size: 22px; font-weight: 800; color: var(--accent-gold); margin-bottom: 3px; }
+.stat-label { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+
+/* Mood / Rules */
+.mood-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.mood-card { background: var(--bg-card); border-radius: 14px; padding: 20px; border: 1px solid var(--border-subtle); }
+.mood-card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+.mood-card-text { font-size: 11px; color: var(--text-muted); line-height: 1.7; }
+.mood-keywords { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.mood-keyword { padding: 4px 10px; background: rgba(245,158,11,0.08); border-radius: 12px; font-size: 10px; color: var(--accent-gold); border: 1px solid rgba(245,158,11,0.15); }
+
+.rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.rule-card { background: var(--bg-card); border-radius: 10px; padding: 16px; border: 1px solid var(--border-subtle); }
+.rule-card.do { border-left: 3px solid var(--accent-green); }
+.rule-card.dont { border-left: 3px solid var(--accent-red); }
+.rule-card-label { font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+.rule-card.do .rule-card-label { color: var(--accent-green); }
+.rule-card.dont .rule-card-label { color: var(--accent-red); }
+.rule-card-text { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+
+/* Grid / Spacing */
+.spacing-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.spacing-block { height: 20px; background: var(--accent-gold); border-radius: 4px; opacity: 0.6; }
+.spacing-label { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); min-width: 90px; }
+
+.code-block { background: var(--bg-card); border-radius: 10px; padding: 20px; border: 1px solid var(--border-subtle); font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 2; color: var(--text-muted); }
+.code-block .key { color: var(--accent-gold); }
+.code-block .comment { color: var(--text-dim); }
+
+</style>
+</head>
+<body>
+<div class="poster">
+
+<!-- ===== PAGE 1: COVER ===== -->
+<div class="section section-cover">
+  <img class="cover-logo" src="logo_main.png" alt="Algora Logo">
+  <div class="cover-title">ALGORA</div>
+  <div class="cover-subtitle">Brand Identity Guidelines</div>
+  <div class="cover-line"></div>
+  <div class="cover-meta">
+    <span>VERSION 1.0</span>
+    <span>MAY 2026</span>
+    <span>CONFIDENTIAL</span>
+  </div>
+  <div class="page-number">01</div>
+</div>
+
+<!-- ===== PAGE 2: BRAND OVERVIEW ===== -->
+<div class="section">
+  <div class="section-label">01 / Brand Overview</div>
+  <div class="section-title">What is Algora?</div>
+  <div class="section-desc">
+    Algora is a bilingual algorithms and problem-solving education platform built for developers worldwide. 
+    The name combines "Algorithm" with "Ora" (light in Latin), symbolizing enlightenment through code. 
+    Algora empowers developers to master computational thinking with an AI-powered learning assistant.
+  </div>
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="stat-number">2</div>
+      <div class="stat-label">Languages</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">AI</div>
+      <div class="stat-label">Powered</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">RTL/LTR</div>
+      <div class="stat-label">Supported</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">Dark</div>
+      <div class="stat-label">First Design</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="mood-grid">
+    <div class="mood-card">
+      <div class="mood-card-title">Brand Personality</div>
+      <div class="mood-card-text">
+        Algora is intelligent yet approachable, technical yet human. It represents the intersection of 
+        deep computer science knowledge and modern AI-assisted learning. The brand speaks with clarity 
+        and precision, never overwhelming, always guiding.
+      </div>
+      <div class="mood-keywords">
+        <span class="mood-keyword">Precise</span>
+        <span class="mood-keyword">Intelligent</span>
+        <span class="mood-keyword">Empowering</span>
+        <span class="mood-keyword">Modern</span>
+        <span class="mood-keyword">Global</span>
+      </div>
+    </div>
+    <div class="mood-card">
+      <div class="mood-card-title">Design Philosophy</div>
+      <div class="mood-card-text">
+        The visual identity follows a "Dark-First" philosophy, reflecting the natural environment 
+        where developers feel most comfortable. The golden amber accent represents 
+        the spark of understanding - that moment when a complex algorithm finally clicks.
+      </div>
+      <div class="mood-keywords">
+        <span class="mood-keyword">Dark-First</span>
+        <span class="mood-keyword">Golden Spark</span>
+        <span class="mood-keyword">Minimal</span>
+        <span class="mood-keyword">Focused</span>
+        <span class="mood-keyword">Elegant</span>
+      </div>
+    </div>
+  </div>
+  <div class="page-number">02</div>
+</div>
+
+<!-- ===== PAGE 3: COLOR PALETTE ===== -->
+<div class="section">
+  <div class="section-label">02 / Color System</div>
+  <div class="section-title">Primary Palette</div>
+  <div class="section-desc">
+    The Algora color system is built on a dark foundation with golden amber as the primary accent. 
+    Every color serves a specific purpose, ensuring visual clarity during intensive coding sessions.
+  </div>
+  <div class="color-grid">
+    <div class="color-card">
+      <div class="color-swatch" style="background: #0D0D12;"></div>
+      <div class="color-info">
+        <div class="color-name">Deep Void</div>
+        <div class="color-hex">#0D0D12</div>
+        <div class="color-usage">Primary background</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #161622;"></div>
+      <div class="color-info">
+        <div class="color-name">Midnight Code</div>
+        <div class="color-hex">#161622</div>
+        <div class="color-usage">Secondary / Editor BG</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #1A1A2E;"></div>
+      <div class="color-info">
+        <div class="color-name">Nebula</div>
+        <div class="color-hex">#1A1A2E</div>
+        <div class="color-usage">Cards / Sections</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #F59E0B;"></div>
+      <div class="color-info">
+        <div class="color-name">Golden Amber</div>
+        <div class="color-hex">#F59E0B</div>
+        <div class="color-usage">Primary accent / CTAs</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #10B981;"></div>
+      <div class="color-info">
+        <div class="color-name">Emerald Signal</div>
+        <div class="color-hex">#10B981</div>
+        <div class="color-usage">Success / Easy</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #6366F1;"></div>
+      <div class="color-info">
+        <div class="color-name">Nebula Purple</div>
+        <div class="color-hex">#6366F1</div>
+        <div class="color-usage">AI Assistant / Secondary</div>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-title" style="font-size: 18px; margin-bottom: 16px;">Semantic Colors</div>
+  <div class="color-row-full">
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #EF4444;"></div>
+      <div class="color-mini-name">Error</div>
+      <div class="color-mini-hex">#EF4444</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #06B6D4;"></div>
+      <div class="color-mini-name">Info</div>
+      <div class="color-mini-hex">#06B6D4</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #E2E8F0;"></div>
+      <div class="color-mini-name">Text Primary</div>
+      <div class="color-mini-hex">#E2E8F0</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #94A3B8;"></div>
+      <div class="color-mini-name">Text Muted</div>
+      <div class="color-mini-hex">#94A3B8</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #64748B;"></div>
+      <div class="color-mini-name">Text Dim</div>
+      <div class="color-mini-hex">#64748B</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #FBBF24;"></div>
+      <div class="color-mini-name">Gold Light</div>
+      <div class="color-mini-hex">#FBBF24</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-title" style="font-size: 18px; margin-bottom: 16px;">Golden Amber Scale</div>
+  <div class="color-row-full">
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #78350F;"></div>
+      <div class="color-mini-name">900</div>
+      <div class="color-mini-hex">#78350F</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #92400E;"></div>
+      <div class="color-mini-name">800</div>
+      <div class="color-mini-hex">#92400E</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #B45309;"></div>
+      <div class="color-mini-name">700</div>
+      <div class="color-mini-hex">#B45309</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #D97706;"></div>
+      <div class="color-mini-name">600</div>
+      <div class="color-mini-hex">#D97706</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #F59E0B;"></div>
+      <div class="color-mini-name">500</div>
+      <div class="color-mini-hex">#F59E0B</div>
+    </div>
+    <div class="color-mini">
+      <div class="color-mini-swatch" style="background: #FBBF24;"></div>
+      <div class="color-mini-name">400</div>
+      <div class="color-mini-hex">#FBBF24</div>
+    </div>
+  </div>
+  <div class="page-number">03</div>
+</div>
+
+<!-- ===== PAGE 4: LOGO ===== -->
+<div class="section">
+  <div class="section-label">03 / Logo System</div>
+  <div class="section-title">Primary Logo</div>
+  <div class="section-desc">
+    The Algora logo combines geometric code syntax with an algorithmic tree structure, 
+    representing the fusion of programming fundamentals and computational thinking.
+  </div>
+  <div class="logo-main-showcase">
+    <div class="logo-main-wrapper">
+      <img src="logo_main.png" alt="Algora Primary Logo">
+      <div class="logo-main-name">ALGORA</div>
+      <div class="logo-main-tagline">Master Algorithms. Code the Future.</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-title" style="font-size: 18px; margin-bottom: 16px;">Logo Concepts</div>
+  <div class="logo-showcase">
+    <div class="logo-concept-card">
+      <img src="logo_concepts.png" alt="Concept A">
+      <div class="logo-concept-label">Concept A</div>
+      <div class="logo-concept-name">Code Bracket</div>
+      <div class="logo-concept-desc">
+        Abstract &lt; &gt; symbols forming a stylized A. Represents code syntax as the foundation of all programming.
+      </div>
+    </div>
+    <div class="logo-concept-card">
+      <img src="logo_concepts.png" alt="Concept B">
+      <div class="logo-concept-label">Concept B</div>
+      <div class="logo-concept-name">Algorithm Tree</div>
+      <div class="logo-concept-desc">
+        Binary tree node structure with golden connections. Represents data structures and hierarchical thinking.
+      </div>
+    </div>
+    <div class="logo-concept-card">
+      <img src="logo_concepts.png" alt="Concept C">
+      <div class="logo-concept-label">Concept C</div>
+      <div class="logo-concept-name">Syntax A</div>
+      <div class="logo-concept-desc">
+        Letter A integrated with code syntax elements. Represents the fusion of alphabet and algorithm.
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-title" style="font-size: 18px; margin-bottom: 16px;">Logo Clear Space</div>
+  <div class="mood-card">
+    <div class="mood-card-text">
+      Always maintain minimum clear space around the logo equal to the height of the letter "A" in the logotype. 
+      Never place the logo on busy or patterned backgrounds without a solid container. 
+      The minimum reproduction size is 24px height for digital and 8mm for print.
+    </div>
+  </div>
+  <div class="page-number">04</div>
+</div>
+
+<!-- ===== PAGE 5: TYPOGRAPHY ===== -->
+<div class="section">
+  <div class="section-label">04 / Typography</div>
+  <div class="section-title">Type System</div>
+  <div class="section-desc">
+    Algora uses two font families: Inter for UI text and headings, IBM Plex Mono for code and metadata. 
+    This creates clear visual separation between content and code.
+  </div>
+  <div class="type-section">
+    <div class="type-header">Inter / Primary Family</div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">Black 900</div>
+      <div class="type-sample-text" style="font-size: 32px; font-weight: 900;">Algora Platform</div>
+    </div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">ExtraBold 800</div>
+      <div class="type-sample-text" style="font-size: 24px; font-weight: 800;">Section Heading</div>
+    </div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">Bold 700</div>
+      <div class="type-sample-text" style="font-size: 18px; font-weight: 700;">Card Title</div>
+    </div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">SemiBold 600</div>
+      <div class="type-sample-text" style="font-size: 14px; font-weight: 600;">Button Label</div>
+    </div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">Regular 400</div>
+      <div class="type-sample-text" style="font-size: 13px; font-weight: 400;">Body text for problem descriptions and explanations.</div>
+    </div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">Light 300</div>
+      <div class="type-sample-text" style="font-size: 11px; font-weight: 300;">Captions, footnotes, and secondary information.</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="type-section">
+    <div class="type-header">IBM Plex Mono / Code Family</div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">SemiBold 600</div>
+      <div class="type-sample-text" style="font-size: 14px; font-weight: 600; font-family: 'IBM Plex Mono', monospace;">function solve(nums) {</div>
+    </div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">Medium 500</div>
+      <div class="type-sample-text" style="font-size: 13px; font-weight: 500; font-family: 'IBM Plex Mono', monospace;">  return nums.sort((a, b) => a - b);</div>
+    </div>
+    <div class="type-sample-row">
+      <div class="type-weight-label">Regular 400</div>
+      <div class="type-sample-text" style="font-size: 11px; font-weight: 400; font-family: 'IBM Plex Mono', monospace;">#0D0D12 / HEX / METADATA</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="type-section">
+    <div class="type-header">Font Scale (TailwindCSS)</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+      <div style="background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 9px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); margin-bottom: 4px;">text-xs</div>
+        <div style="font-size: 12px; font-weight: 500;">12px</div>
+      </div>
+      <div style="background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 9px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); margin-bottom: 4px;">text-sm</div>
+        <div style="font-size: 14px; font-weight: 500;">14px</div>
+      </div>
+      <div style="background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 9px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); margin-bottom: 4px;">text-base</div>
+        <div style="font-size: 16px; font-weight: 500;">16px</div>
+      </div>
+      <div style="background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 9px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); margin-bottom: 4px;">text-lg</div>
+        <div style="font-size: 18px; font-weight: 600;">18px</div>
+      </div>
+      <div style="background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 9px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); margin-bottom: 4px;">text-xl</div>
+        <div style="font-size: 20px; font-weight: 600;">20px</div>
+      </div>
+      <div style="background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 9px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); margin-bottom: 4px;">text-2xl</div>
+        <div style="font-size: 24px; font-weight: 700;">24px</div>
+      </div>
+      <div style="background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 9px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); margin-bottom: 4px;">text-3xl</div>
+        <div style="font-size: 30px; font-weight: 700;">30px</div>
+      </div>
+      <div style="background: var(--bg-card); border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 9px; font-family: 'IBM Plex Mono', monospace; color: var(--text-dim); margin-bottom: 4px;">text-4xl</div>
+        <div style="font-size: 36px; font-weight: 800;">36px</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-number">05</div>
+</div>
+
+<!-- ===== PAGE 6: UI COMPONENTS ===== -->
+<div class="section">
+  <div class="section-label">05 / UI Components</div>
+  <div class="section-title">Interface Elements</div>
+  <div class="section-desc">
+    All UI components follow the dark-first golden-accent design system, optimized for 
+    maximum clarity during intensive coding sessions.
+  </div>
+  <div class="ui-grid">
+    <div class="ui-card">
+      <div class="ui-card-title">Buttons</div>
+      <div class="btn-row">
+        <button class="btn btn-primary">Submit Solution</button>
+        <button class="btn btn-secondary">Run Code</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost">View Hint</button>
+        <button class="btn btn-danger">Reset</button>
+        <button class="btn btn-success">Solved</button>
+      </div>
+      <div style="margin-top: 16px;">
+        <div class="ui-card-title">Difficulty Badges</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <span class="badge badge-easy">Easy</span>
+          <span class="badge badge-medium">Medium</span>
+          <span class="badge badge-hard">Hard</span>
+        </div>
+      </div>
+    </div>
+    <div class="ui-card">
+      <div class="ui-card-title">Input Fields</div>
+      <input class="input-demo" type="text" value="Search problems..." readonly>
+      <input class="input-demo" type="text" value="function binarySearch(arr, target) {" readonly style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+      <div style="margin-top: 16px;">
+        <div class="ui-card-title">Progress Indicators</div>
+        <div style="margin-bottom: 14px;">
+          <div class="progress-label" style="margin-bottom: 4px;">Problem Progress</div>
+          <div class="progress-bar-demo"><div class="progress-fill" style="width: 72%;"></div></div>
+          <div class="progress-label">72% complete</div>
+        </div>
+        <div>
+          <div class="progress-label" style="margin-bottom: 4px;">Streak</div>
+          <div class="progress-bar-demo"><div class="progress-fill" style="width: 100%; background: linear-gradient(90deg, var(--accent-green), #34D399);"></div></div>
+          <div class="progress-label" style="color: var(--accent-green);">15 days active</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-title" style="font-size: 18px; margin-bottom: 16px;">Spacing System</div>
+  <div style="display: flex; gap: 24px;">
+    <div style="flex: 1;">
+      <div class="spacing-bar"><div class="spacing-block" style="width: 4px;"></div><div class="spacing-label">4px (1 unit)</div></div>
+      <div class="spacing-bar"><div class="spacing-block" style="width: 8px;"></div><div class="spacing-label">8px (2 units)</div></div>
+      <div class="spacing-bar"><div class="spacing-block" style="width: 16px;"></div><div class="spacing-label">16px (4 units)</div></div>
+      <div class="spacing-bar"><div class="spacing-block" style="width: 24px;"></div><div class="spacing-label">24px (6 units)</div></div>
+      <div class="spacing-bar"><div class="spacing-block" style="width: 32px;"></div><div class="spacing-label">32px (8 units)</div></div>
+      <div class="spacing-bar"><div class="spacing-block" style="width: 48px;"></div><div class="spacing-label">48px (12 units)</div></div>
+    </div>
+    <div style="flex: 1;">
+      <div class="ui-card-title">Border Radius</div>
+      <div style="display: flex; gap: 10px; align-items: end; margin-bottom: 20px;">
+        <div style="text-align: center;">
+          <div style="width: 36px; height: 36px; background: var(--accent-gold); border-radius: 4px; opacity: 0.6; margin-bottom: 4px;"></div>
+          <div style="font-size: 10px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;">4px</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 36px; height: 36px; background: var(--accent-gold); border-radius: 8px; opacity: 0.6; margin-bottom: 4px;"></div>
+          <div style="font-size: 10px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;">8px</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 36px; height: 36px; background: var(--accent-gold); border-radius: 12px; opacity: 0.6; margin-bottom: 4px;"></div>
+          <div style="font-size: 10px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;">12px</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 36px; height: 36px; background: var(--accent-gold); border-radius: 16px; opacity: 0.6; margin-bottom: 4px;"></div>
+          <div style="font-size: 10px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;">16px</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="width: 36px; height: 36px; background: var(--accent-gold); border-radius: 50%; opacity: 0.6; margin-bottom: 4px;"></div>
+          <div style="font-size: 10px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;">Full</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-number">06</div>
+</div>
+
+<!-- ===== PAGE 7: GUIDELINES ===== -->
+<div class="section">
+  <div class="section-label">06 / Usage Guidelines</div>
+  <div class="section-title">Brand Rules</div>
+  <div class="section-desc">
+    Consistent application ensures the Algora brand remains cohesive across all touchpoints, 
+    from the web platform to social media and print materials.
+  </div>
+  <div class="rules-grid">
+    <div class="rule-card do">
+      <div class="rule-card-label">Do</div>
+      <div class="rule-card-text">
+        Maintain clear space around the logo. Use it on dark backgrounds. 
+        Keep golden amber for primary CTAs only. Use Inter for text and IBM Plex Mono for code. 
+        Maintain RTL support for Arabic content.
+      </div>
+    </div>
+    <div class="rule-card do">
+      <div class="rule-card-label">Do</div>
+      <div class="rule-card-text">
+        Keep body text at 14-16px for readability. Use semantic color meanings consistently. 
+        Test all pages in both RTL and LTR layouts. 
+        Ensure minimum contrast ratio of 4.5:1 for body text.
+      </div>
+    </div>
+    <div class="rule-card dont">
+      <div class="rule-card-label">Don't</div>
+      <div class="rule-card-text">
+        Never stretch, rotate, or distort the logo. Never place it on busy backgrounds. 
+        Never use golden accent for more than one primary CTA per screen. 
+        Never use light mode as the default.
+      </div>
+    </div>
+    <div class="rule-card dont">
+      <div class="rule-card-label">Don't</div>
+      <div class="rule-card-text">
+        Never use more than 5 distinct colors per page. Never mix Google Translate 
+        with hand-crafted content. Never use decorative borders on body pages. 
+        Never add stock images or clipart for decoration.
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-title" style="font-size: 18px; margin-bottom: 16px;">CSS Variables (TailwindCSS)</div>
+  <div class="code-block">
+    <span class="comment">/* Base Colors */</span><br>
+    <span class="key">--bg-primary</span>: #0D0D12;<br>
+    <span class="key">--bg-secondary</span>: #161622;<br>
+    <span class="key">--bg-card</span>: #1A1A2E;<br>
+    <span class="comment">/* Accents */</span><br>
+    <span class="key">--accent-gold</span>: #F59E0B;<br>
+    <span class="key">--accent-green</span>: #10B981;<br>
+    <span class="key">--accent-purple</span>: #6366F1;<br>
+    <span class="key">--accent-red</span>: #EF4444;<br>
+    <span class="comment">/* Typography */</span><br>
+    <span class="key">--font-heading</span>: 'Inter', sans-serif;<br>
+    <span class="key">--font-code</span>: 'IBM Plex Mono', monospace;
+  </div>
+  <div class="divider"></div>
+  <div class="section-title" style="font-size: 18px; margin-bottom: 16px;">Page Layout Grid</div>
+  <div style="background: var(--bg-card); border-radius: 10px; padding: 20px; border: 1px solid var(--border-subtle);">
+    <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; margin-bottom: 10px;">
+      <div style="grid-column: span 8; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 4px; padding: 6px; text-align: center; font-size: 10px; color: var(--accent-gold);">Content (8 cols)</div>
+      <div style="grid-column: span 4; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 4px; padding: 6px; text-align: center; font-size: 10px; color: var(--accent-purple);">Sidebar (4 cols)</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px;">
+      <div style="grid-column: span 4; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 4px; padding: 6px; text-align: center; font-size: 10px; color: var(--accent-green);">Card</div>
+      <div style="grid-column: span 4; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 4px; padding: 6px; text-align: center; font-size: 10px; color: var(--accent-green);">Card</div>
+      <div style="grid-column: span 4; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 4px; padding: 6px; text-align: center; font-size: 10px; color: var(--accent-green);">Card</div>
+    </div>
+    <div style="margin-top: 14px; font-size: 10px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;">
+      Grid: 12-column / Gap: 16px / Max Width: 1280px / Padding: 24px
+    </div>
+  </div>
+  <div class="page-number">07</div>
+</div>
+
+</div>
+</body>
+</html>
