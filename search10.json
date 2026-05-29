@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://blog.expo.dev/building-a-code-editor-with-monaco-f84b3a06deaf",
+    "name": "Building a code editor with Monaco | by Satyajit Sahoo - Exposition",
+    "snippet": "Improving the JavaScript and React development experience. By default, the editor works great with JavaScript files, with awesome IntelliSense.",
+    "host_name": "blog.expo.dev",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=THgBePRV13o",
+    "name": "Build a Browser Code Editor in React (Monaco React Editor)",
+    "snippet": "In this video you'll learn how to build an in-browser code editor that supports multiple languages! We'll use the Monaco react library for ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://levelup.gitconnected.com/how-to-build-a-web-ide-ab2563f24647",
+    "name": "How to build a Web IDE like codesandbox - Level Up Coding",
+    "snippet": "For Editor there are many react monaco wrappers out there, but after trying out a few of them the best one I found is from typefox called monaco ...",
+    "host_name": "levelup.gitconnected.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/orgs/community/discussions/163819",
+    "name": "Best practices for building an interactive coding tutorial platform with",
+    "snippet": "I'm building an educational coding platform similar to W3Schools using React, where users can read tutorials and practice coding in an integrated editor.",
+    "host_name": "github.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.opcito.com/blogs/integrating-monaco-editor-into-a-react-application",
+    "name": "Integrating Monaco editor into a React application - Opcito",
+    "snippet": "Learn how to embed Monaco Editor in React apps for VS Code–like editing and real-time collaboration. Enhance developer productivity.",
+    "host_name": "www.opcito.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/reactjs/comments/pqms9g/i_created_an_ide_in_the_browser_with_realtime",
+    "name": "I created an IDE in the browser with real-time collaboration - Reddit",
+    "snippet": "100% free and open-source. Repo: https://github.com/lstkz/live-ide. Simply create a workspace, copy the URL and give it to your friend.",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/69759737/how-to-use-monaco-editor-in-a-react-functional-component",
+    "name": "How to use Monaco Editor in a React functional component?",
+    "snippet": "I have a functional component in my React project. I have included the Monaco editor dependency as import * as Monaco from 'monaco-editor/esm/vs/editor/editor. ...",
+    "host_name": "stackoverflow.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.npmjs.com/package/@monaco-editor/react",
+    "name": "monaco-editor/react - NPM",
+    "snippet": "This library handles the setup process of the monaco-editor and provides a clean API to interact with monaco from any React environment.",
+    "host_name": "www.npmjs.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.devgenius.io/create-a-web-editor-using-monaco-editor-react-and-node-webpack-and-typescript-how-hard-can-it-597332454a24",
+    "name": "[Part 1] Create a web editor using Monaco editor, React and Node +",
+    "snippet": "This is the initial and easiest way that I know of to integrate the Monaco editor on to your react app.",
+    "host_name": "blog.devgenius.io",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://microsoft.github.io/monaco-editor",
+    "name": "Monaco Editor",
+    "snippet": "The Monaco Editor is the code editor that powers VS Code. A good page describing the code editor's features is here. It is licensed under the MIT License.",
+    "host_name": "microsoft.github.io",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]
