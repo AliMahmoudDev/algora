@@ -2,25 +2,29 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Github, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Github, Eye, EyeOff, Loader2, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 export default function SignInPage() {
   const t = useTranslations('Auth.signIn');
+  const tGeneral = useTranslations('Auth');
   const locale = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const isSupabaseConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL && 
+    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co';
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -43,21 +47,70 @@ export default function SignInPage() {
     setIsLoading(true);
     setErrors({});
 
-    try {
-      // Supabase sign in logic will be connected here
-      // For now, simulate a delay and redirect
+    if (!isSupabaseConfigured) {
+      // Simulate if Supabase not configured
       await new Promise(resolve => setTimeout(resolve, 1500));
       router.push(`/${locale}/problems`);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        // Map Supabase errors to user-friendly messages
+        const errorMap: Record<string, string> = {
+          'invalid_credentials': t('errors.invalidCredentials'),
+          'invalid_grant': t('errors.wrongPassword'),
+          'user_not_found': t('errors.userNotFound'),
+          'email_not_confirmed': t('errors.emailNotConfirmed'),
+          'too_many_requests': t('errors.tooManyRequests'),
+        };
+        
+        const errorKey = error.message.toLowerCase().includes('invalid login') ? 'invalid_credentials' :
+          error.message.toLowerCase().includes('email not confirmed') ? 'email_not_confirmed' :
+          error.message.toLowerCase().includes('too many') ? 'too_many_requests' : null;
+
+        setErrors({
+          general: errorKey ? errorMap[errorKey] : error.message
+        });
+      } else {
+        router.push(`/${locale}/problems`);
+      }
     } catch {
-      setErrors({ general: t('errors.invalidCredentials') });
+      setErrors({ general: t('errors.generalError') });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleOAuth = (provider: 'github' | 'google') => {
-    // Supabase OAuth logic will be connected here
-    console.log('OAuth with:', provider);
+  const handleOAuth = async (provider: 'github' | 'google') => {
+    if (!isSupabaseConfigured) {
+      setErrors({ general: tGeneral('supabaseNotConnected') });
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/${locale}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        setErrors({ general: t('errors.oauthError') });
+      }
+      // Browser will redirect to OAuth provider
+    } catch {
+      setErrors({ general: t('errors.oauthError') });
+    }
   };
 
   return (
@@ -96,6 +149,14 @@ export default function SignInPage() {
             </p>
           </div>
 
+          {/* Supabase not configured warning */}
+          {!isSupabaseConfigured && (
+            <div className="mb-6 p-3 rounded-lg bg-algora-gold/10 border border-algora-gold/20 text-algora-gold text-sm text-center flex items-center justify-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>{tGeneral('supabaseNotConnected')}</span>
+            </div>
+          )}
+
           {/* General Error */}
           {errors.general && (
             <div className="mb-6 p-3 rounded-lg bg-algora-red/10 border border-algora-red/20 text-algora-red text-sm text-center">
@@ -109,6 +170,7 @@ export default function SignInPage() {
               variant="outline"
               className="w-full border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.2)] text-algora-text-primary rounded-lg h-11"
               onClick={() => handleOAuth('github')}
+              disabled={!isSupabaseConfigured}
             >
               <Github className="w-4 h-4 me-2" />
               {t('github')}
@@ -117,6 +179,7 @@ export default function SignInPage() {
               variant="outline"
               className="w-full border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.2)] text-algora-text-primary rounded-lg h-11"
               onClick={() => handleOAuth('google')}
+              disabled={!isSupabaseConfigured}
             >
               <svg className="w-4 h-4 me-2" viewBox="0 0 24 24">
                 <path

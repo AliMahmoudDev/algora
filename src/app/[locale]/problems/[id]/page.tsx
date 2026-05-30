@@ -1,10 +1,12 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -12,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft,
   Play,
@@ -20,36 +21,26 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
+  Terminal,
+  TestTube2,
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
-import { getProblemById, difficultyConfig } from '@/data/mock-problems';
+import { getProblemById, difficultyConfig, type Problem } from '@/data/mock-problems';
 
-const starterCode: Record<string, Record<string, string>> = {
-  'two-sum': {
-    python: `class Solution:\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        # Write your solution here\n        pass`,
-    javascript: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n    // Write your solution here\n}`,
-    cpp: `class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Write your solution here\n    }\n};`,
-    java: `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Write your solution here\n    }\n}`,
-  },
-  'valid-palindrome': {
-    python: `class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        # Write your solution here\n        pass`,
-    javascript: `function isPalindrome(s) {\n    // Write your solution here\n}`,
-    cpp: `class Solution {\npublic:\n    bool isPalindrome(string s) {\n        // Write your solution here\n    }\n};`,
-    java: `class Solution {\n    public boolean isPalindrome(String s) {\n        // Write your solution here\n    }\n}`,
-  },
-  'binary-search': {
-    python: `class Solution:\n    def search(self, nums: list[int], target: int) -> int:\n        # Write your solution here\n        pass`,
-    javascript: `function search(nums, target) {\n    // Write your solution here\n}`,
-    cpp: `class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        // Write your solution here\n    }\n};`,
-    java: `class Solution {\n    public int search(int[] nums, int target) {\n        // Write your solution here\n    }\n}`,
-  },
-};
-
-const defaultStarterCode: Record<string, string> = {
-  python: `class Solution:\n    def solve(self) -> None:\n        # Write your solution here\n        pass`,
-  javascript: `function solve() {\n    // Write your solution here\n}`,
-  cpp: `class Solution {\npublic:\n    // Write your solution here\n};`,
-  java: `class Solution {\n    // Write your solution here\n}`,
-};
+// Dynamically import Monaco Editor (no SSR)
+const MonacoEditor = dynamic(() => import('@monaco-editor/react').then(mod => mod.default), {
+  ssr: false,
+  loading: () => (
+    <div className="flex-1 flex items-center justify-center bg-[#161622]">
+      <div className="flex items-center gap-2 text-algora-text-dim">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span className="text-sm">Loading editor...</span>
+      </div>
+    </div>
+  ),
+});
 
 const fileNames: Record<string, string> = {
   python: 'solution.py',
@@ -58,19 +49,63 @@ const fileNames: Record<string, string> = {
   java: 'Solution.java',
 };
 
+const monacoLanguageIds: Record<string, string> = {
+  python: 'python',
+  javascript: 'javascript',
+  cpp: 'cpp',
+  java: 'java',
+};
+
+interface TestCaseResult {
+  testCaseIndex: number;
+  input: string;
+  expectedOutput: string;
+  actualOutput: string;
+  passed: boolean;
+  time: string;
+  memory: number;
+  error?: string;
+}
+
+interface ExecutionOutput {
+  type: 'run' | 'submit';
+  stdout: string | null;
+  stderr: string | null;
+  compileOutput: string | null;
+  statusCode: number;
+  statusDescription: string;
+  time: string;
+  memory: number;
+  testCaseResults?: TestCaseResult[];
+}
+
 export default function ProblemViewPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
   const { id } = use(params);
   const t = useTranslations('ProblemView');
   const locale = useLocale();
   const [language, setLanguage] = useState('python');
   const [code, setCode] = useState('');
-  const [output, setOutput] = useState('');
+  const [output, setOutput] = useState<ExecutionOutput | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<'success' | 'fail' | null>(null);
   const [activeTab, setActiveTab] = useState<'description' | 'submissions'>('description');
+  const [consoleTab, setConsoleTab] = useState<'output' | 'testcases'>('output');
+  const [customInput, setCustomInput] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [expandedTestCases, setExpandedTestCases] = useState<Set<number>>(new Set());
+  const editorRef = useRef<unknown>(null);
+  const consoleEndRef = useRef<HTMLDivElement>(null);
 
   const problem = getProblemById(id);
+
+  useEffect(() => {
+    consoleEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [output]);
+
+  const handleEditorMount = useCallback((editor: unknown) => {
+    editorRef.current = editor;
+  }, []);
 
   if (!problem) {
     return (
@@ -89,31 +124,168 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
 
   const config = difficultyConfig[problem.difficulty];
 
-  const getCode = () => {
-    if (code) return code;
-    const slugCode = starterCode[problem.slug];
-    if (slugCode && slugCode[language]) return slugCode[language];
-    return defaultStarterCode[language] || '';
+  // Compute current code (not a hook — plain computed value)
+  const currentCode = code || problem.starterCode[language as keyof Problem['starterCode']] || '';
+
+  const handleLanguageChange = (newLang: string) => {
+    setLanguage(newLang);
+    setCode(''); // Reset code so it picks up the new starter code
+    setOutput(null);
+    setSubmitResult(null);
   };
 
   const handleRun = async () => {
     setIsRunning(true);
-    setOutput('');
+    setOutput(null);
     setSubmitResult(null);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setOutput(`Running...\n\nTest Case 1: ${problem.examples[0]?.input || 'N/A'}\nOutput: ${problem.examples[0]?.output || 'N/A'}\n✓ Passed (0ms)\n\nTest Case 2: ${problem.examples[1]?.input || 'N/A'}\nOutput: ${problem.examples[1]?.output || 'N/A'}\n✓ Passed (1ms)\n\nExecution Time: 52ms\nMemory: 42.1 MB`);
-    setIsRunning(false);
+
+    try {
+      const response = await fetch('/api/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: currentCode,
+          language,
+          stdin: showCustomInput ? customInput : undefined,
+        }),
+      });
+
+      const result = await response.json();
+
+      setOutput({
+        type: 'run',
+        stdout: result.stdout,
+        stderr: result.stderr,
+        compileOutput: result.compile_output,
+        statusCode: result.statusCode,
+        statusDescription: result.statusDescription,
+        time: result.time,
+        memory: result.memory,
+      });
+      setConsoleTab('output');
+    } catch (error) {
+      setOutput({
+        type: 'run',
+        stdout: null,
+        stderr: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        compileOutput: null,
+        statusCode: 13,
+        statusDescription: 'Internal Error',
+        time: '0',
+        memory: 0,
+      });
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setOutput('');
+    setOutput(null);
     setSubmitResult(null);
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    setOutput(`\n✓ All Test Cases Passed!\n\nTest Cases: 52/52\nRuntime: 72ms (faster than 87.3%)\nMemory: 42.1 MB (less than 91.2%)`);
-    setSubmitResult('success');
-    setIsSubmitting(false);
+
+    const testCaseResults: TestCaseResult[] = [];
+    let allPassed = true;
+
+    try {
+      // Run each test case
+      for (let i = 0; i < problem.testCases.length; i++) {
+        const tc = problem.testCases[i];
+
+        try {
+          const response = await fetch('/api/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              code: currentCode,
+              language,
+              stdin: tc.input,
+            }),
+          });
+
+          const result = await response.json();
+          const actualOutput = (result.stdout || '').trim();
+          const expectedOutput = tc.expectedOutput.trim();
+          const passed = actualOutput === expectedOutput;
+
+          if (!passed) allPassed = false;
+
+          testCaseResults.push({
+            testCaseIndex: i,
+            input: tc.input,
+            expectedOutput: tc.expectedOutput,
+            actualOutput,
+            passed,
+            time: result.time || '0',
+            memory: result.memory || 0,
+            error: result.stderr || result.compile_output || undefined,
+          });
+        } catch {
+          allPassed = false;
+          testCaseResults.push({
+            testCaseIndex: i,
+            input: tc.input,
+            expectedOutput: tc.expectedOutput,
+            actualOutput: 'Error executing code',
+            passed: false,
+            time: '0',
+            memory: 0,
+            error: 'Failed to execute',
+          });
+        }
+      }
+
+      setOutput({
+        type: 'submit',
+        stdout: null,
+        stderr: null,
+        compileOutput: null,
+        statusCode: allPassed ? 0 : 1,
+        statusDescription: allPassed ? 'Accepted' : 'Wrong Answer',
+        time: testCaseResults.map(r => r.time).join(', '),
+        memory: Math.max(...testCaseResults.map(r => r.memory)),
+        testCaseResults,
+      });
+
+      setSubmitResult(allPassed ? 'success' : 'fail');
+      setConsoleTab('testcases');
+
+      // Auto-expand failed test cases
+      const failedIndexes = new Set(
+        testCaseResults.filter(r => !r.passed).map(r => r.testCaseIndex)
+      );
+      setExpandedTestCases(failedIndexes);
+    } catch (error) {
+      setOutput({
+        type: 'submit',
+        stdout: null,
+        stderr: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        compileOutput: null,
+        statusCode: 13,
+        statusDescription: 'Internal Error',
+        time: '0',
+        memory: 0,
+      });
+      setSubmitResult('fail');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const toggleTestCaseExpand = (index: number) => {
+    setExpandedTestCases(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
+  const isSupabaseConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL && 
+    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co';
 
   return (
     <div className="h-screen flex flex-col bg-[#0D0D12]">
@@ -138,7 +310,7 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
         </div>
 
         {/* Language selector */}
-        <Select value={language} onValueChange={setLanguage}>
+        <Select value={language} onValueChange={handleLanguageChange}>
           <SelectTrigger className="w-36 bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)] text-algora-text-primary rounded-lg h-8 text-xs focus:border-algora-gold focus:ring-algora-gold/20">
             <SelectValue />
           </SelectTrigger>
@@ -171,7 +343,7 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
               </TabsTrigger>
             </TabsList>
 
-            <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-6">
+            <TabsContent value="description" className="flex-1 overflow-y-auto p-5 md:p-6 space-y-6 mt-0">
               <div className="space-y-4">
                 {/* Problem Statement */}
                 <div className="text-sm text-algora-text-muted leading-relaxed whitespace-pre-line">
@@ -252,7 +424,16 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                   </div>
                 </div>
               </div>
-            </div>
+            </TabsContent>
+
+            <TabsContent value="submissions" className="flex-1 overflow-y-auto p-5 md:p-6 mt-0">
+              <div className="text-sm text-algora-text-dim text-center py-12">
+                {isSupabaseConfigured 
+                  ? (locale === 'ar' ? 'قريباً - سجل الدخول لمشاهدة الإرسالات' : 'Coming soon — sign in to view submissions')
+                  : (locale === 'ar' ? 'قريباً — connect Supabase لتفعيل هذه الميزة' : 'Coming soon — connect Supabase to enable this feature')
+                }
+              </div>
+            </TabsContent>
           </Tabs>
         </div>
 
@@ -264,27 +445,27 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
               size="sm"
               className="bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] text-algora-text-primary rounded-lg h-8 text-xs"
               onClick={handleRun}
-              disabled={isRunning}
+              disabled={isRunning || isSubmitting}
             >
               {isRunning ? (
                 <Loader2 className="w-3.5 h-3.5 me-1.5 animate-spin" />
               ) : (
                 <Play className="w-3.5 h-3.5 me-1.5" />
               )}
-              {t('runCode')}
+              {isRunning ? t('running') : t('runCode')}
             </Button>
             <Button
               size="sm"
               className="bg-algora-green/90 hover:bg-algora-green text-algora-bg-primary rounded-lg h-8 text-xs font-medium"
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isRunning || isSubmitting}
             >
               {isSubmitting ? (
                 <Loader2 className="w-3.5 h-3.5 me-1.5 animate-spin" />
               ) : (
                 <Send className="w-3.5 h-3.5 me-1.5" />
               )}
-              {t('submit')}
+              {isSubmitting ? t('submitting') : t('submit')}
             </Button>
 
             {submitResult && (
@@ -294,12 +475,12 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                 ) : (
                   <XCircle className="w-4 h-4" />
                 )}
-                {submitResult === 'success' ? t('submitSuccess') : t('submitFail')}
+                {submitResult === 'success' ? t('accepted') : t('wrongAnswer')}
               </div>
             )}
           </div>
 
-          {/* Code Editor (placeholder) */}
+          {/* Code Editor */}
           <div className="flex-1 min-h-0 overflow-hidden">
             <div className="h-full flex flex-col">
               {/* Editor header */}
@@ -316,34 +497,246 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                 </div>
               </div>
 
-              {/* Textarea as code editor placeholder */}
-              <textarea
-                value={getCode()}
-                onChange={(e) => setCode(e.target.value)}
-                className="flex-1 min-h-[200px] md:min-h-0 bg-[#161622] text-algora-text-primary font-mono text-sm p-4 resize-none focus:outline-none leading-6 selection:bg-algora-gold/20"
-                spellCheck={false}
-                autoCapitalize="off"
-                autoCorrect="off"
-              />
+              {/* Monaco Editor */}
+              <div className="flex-1 min-h-[200px] md:min-h-0">
+                <MonacoEditor
+                  height="100%"
+                  language={monacoLanguageIds[language] || 'plaintext'}
+                  theme="vs-dark"
+                  value={currentCode}
+                  onChange={(value) => setCode(value || '')}
+                  onMount={handleEditorMount}
+                  options={{
+                    fontSize: 14,
+                    fontFamily: 'var(--font-ibm-plex-mono), IBM Plex Mono, Menlo, Monaco, monospace',
+                    fontLigatures: true,
+                    lineNumbers: 'on',
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    tabSize: 4,
+                    insertSpaces: true,
+                    wordWrap: 'on',
+                    bracketPairColorization: { enabled: true },
+                    guides: {
+                      bracketPairs: true,
+                      indentation: true,
+                    },
+                    padding: { top: 16, bottom: 16 },
+                    renderLineHighlight: 'line',
+                    smoothScrolling: true,
+                    cursorBlinking: 'smooth',
+                    cursorSmoothCaretAnimation: 'on',
+                    selectOnLineNumbers: true,
+                    roundedSelection: true,
+                    contextmenu: true,
+                    folding: true,
+                    foldingHighlight: true,
+                    showFoldingControls: 'always',
+                    matchBrackets: 'always',
+                    links: true,
+                    colorDecorators: true,
+                    overviewRulerBorder: false,
+                    scrollbar: {
+                      verticalScrollbarSize: 8,
+                      horizontalScrollbarSize: 8,
+                    },
+                  }}
+                  loading={
+                    <div className="flex items-center justify-center h-full bg-[#161622]">
+                      <div className="flex items-center gap-2 text-algora-text-dim">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span className="text-sm">Loading Monaco Editor...</span>
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
             </div>
           </div>
 
           {/* Console */}
-          <div className="border-t border-[rgba(255,255,255,0.08)] bg-[#161622]">
-            <div className="flex items-center px-4 py-2 border-b border-[rgba(255,255,255,0.06)]">
-              <span className="text-xs font-medium text-algora-text-dim">
-                {t('console')}
-              </span>
+          <div className="border-t border-[rgba(255,255,255,0.08)] bg-[#161622]" style={{ height: '240px' }}>
+            <div className="flex items-center justify-between px-4 py-2 border-b border-[rgba(255,255,255,0.06)]">
+              <div className="flex items-center gap-4">
+                <Tabs value={consoleTab} onValueChange={(v) => setConsoleTab(v as 'output' | 'testcases')}>
+                  <TabsList className="bg-transparent h-8 p-0">
+                    <TabsTrigger
+                      value="output"
+                      className="rounded-lg data-[state=active]:bg-[rgba(255,255,255,0.06)] data-[state=active]:text-algora-gold text-algora-text-dim data-[state=active]:shadow-none h-7 px-3 text-xs"
+                    >
+                      <Terminal className="w-3 h-3 me-1.5" />
+                      {t('outputTab')}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="testcases"
+                      className="rounded-lg data-[state=active]:bg-[rgba(255,255,255,0.06)] data-[state=active]:text-algora-gold text-algora-text-dim data-[state=active]:shadow-none h-7 px-3 text-xs"
+                    >
+                      <TestTube2 className="w-3 h-3 me-1.5" />
+                      {t('testCasesTab')}
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-xs text-algora-text-dim hover:text-algora-text-muted px-2"
+                  onClick={() => setShowCustomInput(!showCustomInput)}
+                >
+                  {showCustomInput ? <ChevronDown className="w-3 h-3 me-1" /> : <ChevronRight className="w-3 h-3 me-1" />}
+                  {t('stdin')}
+                </Button>
+              </div>
             </div>
-            <div className="p-4 max-h-40 overflow-y-auto">
-              {output ? (
-                <pre className="text-xs text-algora-text-muted font-mono whitespace-pre-wrap leading-5">
-                  {output}
-                </pre>
-              ) : (
-                <p className="text-xs text-algora-text-dim">
-                  {t('noOutput')}
-                </p>
+
+            {/* Custom Input */}
+            {showCustomInput && (
+              <div className="border-b border-[rgba(255,255,255,0.06)] px-4 py-2">
+                <textarea
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  placeholder={t('enterCustomInput')}
+                  className="w-full bg-[rgba(255,255,255,0.02)] text-algora-text-primary text-xs font-mono p-2 rounded border border-[rgba(255,255,255,0.06)] focus:border-algora-gold focus:ring-algora-gold/20 focus:outline-none resize-none"
+                  rows={3}
+                  spellCheck={false}
+                />
+              </div>
+            )}
+
+            <div className="overflow-y-auto p-4" style={{ maxHeight: showCustomInput ? '130px' : '170px' }}>
+              {/* Output Tab */}
+              {consoleTab === 'output' && (
+                output ? (
+                  <div className="space-y-2">
+                    {output.stdout && (
+                      <div>
+                        <span className="text-[10px] font-medium text-algora-green/70 uppercase tracking-wider block mb-1">{t('stdout')}</span>
+                        <pre className="text-xs text-algora-text-primary font-mono whitespace-pre-wrap leading-5 bg-[rgba(255,255,255,0.02)] p-2 rounded border border-[rgba(255,255,255,0.04)]">
+                          {output.stdout}
+                        </pre>
+                      </div>
+                    )}
+                    {output.stderr && (
+                      <div>
+                        <span className="text-[10px] font-medium text-algora-red/70 uppercase tracking-wider block mb-1">{t('stderr')}</span>
+                        <pre className="text-xs text-algora-red font-mono whitespace-pre-wrap leading-5 bg-[rgba(239,68,68,0.03)] p-2 rounded border border-[rgba(239,68,68,0.1)]">
+                          {output.stderr}
+                        </pre>
+                      </div>
+                    )}
+                    {output.compileOutput && (
+                      <div>
+                        <span className="text-[10px] font-medium text-algora-gold/70 uppercase tracking-wider block mb-1">{t('compilationError')}</span>
+                        <pre className="text-xs text-algora-gold font-mono whitespace-pre-wrap leading-5 bg-[rgba(245,158,11,0.03)] p-2 rounded border border-[rgba(245,158,11,0.1)]">
+                          {output.compileOutput}
+                        </pre>
+                      </div>
+                    )}
+                    {!output.stdout && !output.stderr && !output.compileOutput && (
+                      <pre className="text-xs text-algora-text-muted font-mono whitespace-pre-wrap leading-5">
+                        {output.statusDescription}
+                      </pre>
+                    )}
+                    {output.time && output.time !== '0' && (
+                      <div className="flex items-center gap-4 pt-1 text-[10px] text-algora-text-dim">
+                        <span>{t('executionTime')}: {output.time}s</span>
+                        {output.memory > 0 && <span>{t('memoryUsage')}: {(output.memory / 1024).toFixed(1)} MB</span>}
+                      </div>
+                    )}
+                    <div ref={consoleEndRef} />
+                  </div>
+                ) : (
+                  <p className="text-xs text-algora-text-dim">
+                    {t('noOutput')}
+                  </p>
+                )
+              )}
+
+              {/* Test Cases Tab */}
+              {consoleTab === 'testcases' && (
+                output?.testCaseResults ? (
+                  <div className="space-y-2">
+                    {/* Summary */}
+                    <div className="flex items-center gap-3 text-xs font-medium pb-2 border-b border-[rgba(255,255,255,0.06)]">
+                      <span className={`flex items-center gap-1 ${output.testCaseResults.every(r => r.passed) ? 'text-algora-green' : 'text-algora-red'}`}>
+                        {output.testCaseResults.every(r => r.passed) ? (
+                          <><CheckCircle2 className="w-3.5 h-3.5" /> {output.testCaseResults.length}/{output.testCaseResults.length} {t('passed')}</>
+                        ) : (
+                          <>
+                            <XCircle className="w-3.5 h-3.5" />
+                            {output.testCaseResults.filter(r => r.passed).length}/{output.testCaseResults.length} {t('passed')}
+                          </>
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Individual test cases */}
+                    {output.testCaseResults.map((tc, idx) => (
+                      <div
+                        key={idx}
+                        className={`rounded-lg border overflow-hidden ${tc.passed ? 'border-algora-green/20' : 'border-algora-red/20'}`}
+                      >
+                        <button
+                          className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+                          onClick={() => toggleTestCaseExpand(idx)}
+                        >
+                          {expandedTestCases.has(idx) ? (
+                            <ChevronDown className="w-3 h-3 text-algora-text-dim shrink-0" />
+                          ) : (
+                            <ChevronRight className="w-3 h-3 text-algora-text-dim shrink-0" />
+                          )}
+                          <span className={`text-xs font-medium ${tc.passed ? 'text-algora-green' : 'text-algora-red'}`}>
+                            {t('testCase')} {idx + 1}
+                          </span>
+                          {tc.passed ? (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-algora-green ms-auto shrink-0" />
+                          ) : (
+                            <XCircle className="w-3.5 h-3.5 text-algora-red ms-auto shrink-0" />
+                          )}
+                        </button>
+
+                        {expandedTestCases.has(idx) && (
+                          <div className="px-3 py-2 space-y-2 border-t border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.01)]">
+                            <div>
+                              <span className="text-[10px] text-algora-text-dim uppercase tracking-wider">{t('input')}:</span>
+                              <pre className="text-xs text-algora-text-muted font-mono mt-0.5">{tc.input}</pre>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <span className="text-[10px] text-algora-text-dim uppercase tracking-wider">{t('output')}:</span>
+                                <pre className="text-xs text-algora-text-primary font-mono mt-0.5 bg-[rgba(255,255,255,0.02)] p-1.5 rounded">{tc.actualOutput || '(empty)'}</pre>
+                              </div>
+                              <div>
+                                <span className="text-[10px] text-algora-text-dim uppercase tracking-wider">{t('passed')}:</span>
+                                <pre className="text-xs text-algora-green font-mono mt-0.5 bg-[rgba(16,185,129,0.03)] p-1.5 rounded">{tc.expectedOutput}</pre>
+                              </div>
+                            </div>
+                            {tc.error && (
+                              <div>
+                                <span className="text-[10px] text-algora-red/70 uppercase tracking-wider">{t('stderr')}:</span>
+                                <pre className="text-xs text-algora-red font-mono mt-0.5">{tc.error}</pre>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-3 text-[10px] text-algora-text-dim pt-1">
+                              <span>{t('executionTime')}: {tc.time}s</span>
+                              {tc.memory > 0 && <span>{t('memoryUsage')}: {(tc.memory / 1024).toFixed(1)} MB</span>}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    <div ref={consoleEndRef} />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 text-algora-text-dim">
+                    <TestTube2 className="w-6 h-6 mb-2 opacity-50" />
+                    <p className="text-xs">
+                      {isSubmitting ? t('submitting') : (locale === 'ar' ? 'اضغط "إرسال" لتشغيل حالات الاختبار' : 'Click "Submit" to run test cases')}
+                    </p>
+                  </div>
+                )
               )}
             </div>
           </div>

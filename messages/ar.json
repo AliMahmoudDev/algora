@@ -123,7 +123,13 @@
         "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
         "passwordRequired": "كلمة المرور مطلوبة",
         "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
-        "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+        "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        "userNotFound": "المستخدم غير موجود. تحقق من بريدك الإلكتروني.",
+        "wrongPassword": "كلمة المرور غير صحيحة. حاول مرة أخرى.",
+        "emailNotConfirmed": "يرجى تأكيد عنوان بريدك الإلكتروني قبل تسجيل الدخول.",
+        "tooManyRequests": "محاولات كثيرة. حاول مرة أخرى لاحقاً.",
+        "oauthError": "فشل تسجيل الدخول عبر OAuth. حاول مرة أخرى.",
+        "generalError": "حدث خطأ. حاول مرة أخرى."
       }
     },
     "signUp": {
@@ -138,19 +144,33 @@
       "confirmPassword": "تأكيد كلمة المرور",
       "confirmPasswordPlaceholder": "أكد كلمة المرور",
       "submit": "إنشاء حساب",
+      "creating": "جارٍ إنشاء الحساب...",
       "hasAccount": "لديك حساب بالفعل؟",
       "signInLink": "تسجيل الدخول",
       "orContinueWith": "أو تابع باستخدام",
       "github": "إنشاء حساب بواسطة GitHub",
       "google": "إنشاء حساب بواسطة Google",
+      "confirmEmail": "تحقق من بريدك الإلكتروني لتأكيد حسابك.",
       "errors": {
         "nameRequired": "الاسم مطلوب",
         "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
         "passwordRequired": "كلمة المرور مطلوبة",
         "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
-        "passwordMismatch": "كلمات المرور غير متطابقة"
+        "passwordMismatch": "كلمات المرور غير متطابقة",
+        "emailAlreadyExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل.",
+        "weakPassword": "كلمة المرور ضعيفة جداً. استخدم 6 أحرف على الأقل مع أحرف وأرقام.",
+        "signupError": "فشل إنشاء الحساب. حاول مرة أخرى.",
+        "oauthError": "فشل تسجيل الدخول عبر OAuth. حاول مرة أخرى."
       }
-    }
+    },
+    "callback": {
+      "processing": "جارٍ معالجة المصادقة...",
+      "success": "تمت المصادقة بنجاح! جارٍ التحويل...",
+      "error": "فشلت المصادقة. حاول مرة أخرى.",
+      "redirecting": "جارٍ التحويل..."
+    },
+    "notConfigured": "المصادقة غير مهيأة. يرجى ربط Supabase لتفعيل تسجيل الدخول.",
+    "supabaseNotConnected": "Supabase غير مهيأ. ميزات المصادقة معطلة."
   },
   "Problems": {
     "pageTitle": "مجموعة المسائل",
@@ -198,6 +218,27 @@
     "submitSuccess": "جميع حالات الاختبار نجحت! ✓",
     "submitFail": "بعض حالات الاختبار فشلت. حاول مرة أخرى.",
     "runtime": "وقت التشغيل",
-    "memory": "الذاكرة"
+    "memory": "الذاكرة",
+    "running": "جارٍ التشغيل...",
+    "submitting": "جارٍ الإرسال...",
+    "testCases": "حالات الاختبار",
+    "passed": "نجح",
+    "failed": "فشل",
+    "testCase": "حالة اختبار",
+    "executionError": "خطأ في التنفيذ",
+    "compilationError": "خطأ في الترجمة",
+    "timeLimit": "تجاوز حد الوقت",
+    "executionTime": "وقت التنفيذ",
+    "memoryUsage": "استخدام الذاكرة",
+    "customInput": "مدخل مخصص",
+    "enterCustomInput": "أدخل المدخل المخصص هنا...",
+    "stdin": "المدخل القياسي",
+    "stdout": "المخرج القياسي",
+    "stderr": "مخرج الأخطاء",
+    "accepted": "مقبول",
+    "wrongAnswer": "إجابة خاطئة",
+    "runWithInput": "تشغيل مع مدخل",
+    "outputTab": "المخرج",
+    "testCasesTab": "حالات الاختبار"
   }
 }

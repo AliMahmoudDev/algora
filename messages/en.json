@@ -123,7 +123,13 @@
         "invalidEmail": "Please enter a valid email address",
         "passwordRequired": "Password is required",
         "passwordMinLength": "Password must be at least 6 characters",
-        "invalidCredentials": "Invalid email or password"
+        "invalidCredentials": "Invalid email or password",
+        "userNotFound": "User not found. Please check your email.",
+        "wrongPassword": "Incorrect password. Please try again.",
+        "emailNotConfirmed": "Please confirm your email address before signing in.",
+        "tooManyRequests": "Too many attempts. Please try again later.",
+        "oauthError": "OAuth sign-in failed. Please try again.",
+        "generalError": "An error occurred. Please try again."
       }
     },
     "signUp": {
@@ -138,19 +144,33 @@
       "confirmPassword": "Confirm Password",
       "confirmPasswordPlaceholder": "Confirm your password",
       "submit": "Create Account",
+      "creating": "Creating account...",
       "hasAccount": "Already have an account?",
       "signInLink": "Sign In",
       "orContinueWith": "Or continue with",
       "github": "Sign up with GitHub",
       "google": "Sign up with Google",
+      "confirmEmail": "Please check your email to confirm your account.",
       "errors": {
         "nameRequired": "Name is required",
         "invalidEmail": "Please enter a valid email address",
         "passwordRequired": "Password is required",
         "passwordMinLength": "Password must be at least 6 characters",
-        "passwordMismatch": "Passwords do not match"
+        "passwordMismatch": "Passwords do not match",
+        "emailAlreadyExists": "An account with this email already exists.",
+        "weakPassword": "Password is too weak. Use at least 6 characters with letters and numbers.",
+        "signupError": "Failed to create account. Please try again.",
+        "oauthError": "OAuth sign-up failed. Please try again."
       }
-    }
+    },
+    "callback": {
+      "processing": "Processing authentication...",
+      "success": "Successfully authenticated! Redirecting...",
+      "error": "Authentication failed. Please try again.",
+      "redirecting": "Redirecting..."
+    },
+    "notConfigured": "Authentication is not configured. Please connect Supabase to enable sign in.",
+    "supabaseNotConnected": "Supabase is not configured. Authentication features are disabled."
   },
   "Problems": {
     "pageTitle": "Problem Set",
@@ -198,6 +218,27 @@
     "submitSuccess": "All test cases passed! ✓",
     "submitFail": "Some test cases failed. Try again.",
     "runtime": "Runtime",
-    "memory": "Memory"
+    "memory": "Memory",
+    "running": "Running...",
+    "submitting": "Submitting...",
+    "testCases": "Test Cases",
+    "passed": "Passed",
+    "failed": "Failed",
+    "testCase": "Test Case",
+    "executionError": "Execution Error",
+    "compilationError": "Compilation Error",
+    "timeLimit": "Time Limit Exceeded",
+    "executionTime": "Execution Time",
+    "memoryUsage": "Memory Usage",
+    "customInput": "Custom Input",
+    "enterCustomInput": "Enter custom input here...",
+    "stdin": "stdin",
+    "stdout": "stdout",
+    "stderr": "stderr",
+    "accepted": "Accepted",
+    "wrongAnswer": "Wrong Answer",
+    "runWithInput": "Run with input",
+    "outputTab": "Output",
+    "testCasesTab": "Test Cases"
   }
 }
