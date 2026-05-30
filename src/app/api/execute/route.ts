@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { executeCode, LANGUAGE_NAMES, SUPPORTED_LANGUAGES, ACTIVE_LANGUAGES } from '@/lib/piston';
+import { executeCode, SUPPORTED_LANGUAGES } from '@/lib/piston';
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
       statusDescription: result.statusDescription,
       time: result.time,
       memory: result.memory,
-      activeLanguages: ACTIVE_LANGUAGES,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
