@@ -73,6 +73,7 @@ export default function Navbar() {
   const authAwareNavLinks = isConfigured && user
     ? [
         { label: t('home'), href: `/${locale}` },
+        { label: t('dashboard'), href: `/${locale}/dashboard` },
         { label: t('problems'), href: `/${locale}/problems` },
         { label: t('features'), href: `/${locale}#features` },
         { label: t('about'), href: `/${locale}#how-it-works` },
@@ -156,10 +157,10 @@ export default function Navbar() {
                   <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
                   <DropdownMenuItem
                     className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
-                    onClick={() => router.push(`/${locale}/problems`)}
+                    onClick={() => router.push(`/${locale}/dashboard`)}
                   >
                     <User className="w-4 h-4 me-2" />
-                    {t('dashboard')}
+                    {t('profile')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
                   <DropdownMenuItem
