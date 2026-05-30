@@ -103,7 +103,7 @@ export const mockProblems: Problem[] = [
     orderIndex: 1,
     starterCode: {
       python: `class Solution:
-    def twoSum(self, nums: list[int], target: int) -> list[int]:
+    def twoSum(self, nums, target):
         """
         :type nums: List[int]
         :type target: int
@@ -223,7 +223,7 @@ public:
     orderIndex: 3,
     starterCode: {
       python: `class Solution:
-    def search(self, nums: list[int], target: int) -> int:
+    def search(self, nums, target):
         """
         :type nums: List[int]
         :type target: int
@@ -283,7 +283,7 @@ public:
     orderIndex: 4,
     starterCode: {
       python: `class Solution:
-    def maxSubArray(self, nums: list[int]) -> int:
+    def maxSubArray(self, nums):
         """
         :type nums: List[int]
         :rtype: int
@@ -399,7 +399,7 @@ public:
     orderIndex: 6,
     starterCode: {
       python: `class Solution:
-    def productExceptSelf(self, nums: list[int]) -> list[int]:
+    def productExceptSelf(self, nums):
         """
         :type nums: List[int]
         :rtype: List[int]
@@ -457,7 +457,7 @@ public:
     orderIndex: 7,
     starterCode: {
       python: `class Solution:
-    def threeSum(self, nums: list[int]) -> list[list[int]]:
+    def threeSum(self, nums):
         """
         :type nums: List[int]
         :rtype: List[List[int]]
@@ -517,7 +517,7 @@ class Solution {
     orderIndex: 8,
     starterCode: {
       python: `class Solution:
-    def maxArea(self, height: list[int]) -> int:
+    def maxArea(self, height):
         """
         :type height: List[int]
         :rtype: int
@@ -665,7 +665,7 @@ class Solution {
     orderIndex: 10,
     starterCode: {
       python: `class Solution:
-    def findMedianSortedArrays(self, nums1: list[int], nums2: list[int]) -> float:
+    def findMedianSortedArrays(self, nums1, nums2):
         """
         :type nums1: List[int]
         :type nums2: List[int]
@@ -778,15 +778,15 @@ public:
     orderIndex: 12,
     starterCode: {
       python: `class LRUCache:
-    def __init__(self, capacity: int):
+    def __init__(self, capacity):
         self.capacity = capacity
         # Write your solution here
 
-    def get(self, key: int) -> int:
+    def get(self, key):
         # Write your solution here
         pass
 
-    def put(self, key: int, value: int) -> None:
+    def put(self, key, value):
         # Write your solution here
         pass
 
@@ -967,7 +967,7 @@ class Solution {
     orderIndex: 14,
     starterCode: {
       python: `class Solution:
-    def exist(self, board: list[list[str]], word: str) -> bool:
+    def exist(self, board, word):
         """
         :type board: List[List[str]]
         :type word: str
