@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { executeCode, LANGUAGE_NAMES, SUPPORTED_LANGUAGES } from '@/lib/piston';
+import { executeCode, LANGUAGE_NAMES, SUPPORTED_LANGUAGES, ACTIVE_LANGUAGES } from '@/lib/piston';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,30 +20,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    try {
-      const result = await executeCode(code, language, stdin);
+    const result = await executeCode(code, language, stdin);
 
-      return NextResponse.json({
-        stdout: result.stdout,
-        stderr: result.stderr,
-        compile_output: result.compileOutput,
-        statusCode: result.statusCode,
-        statusDescription: result.statusDescription,
-        time: result.time,
-        memory: result.memory,
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      return NextResponse.json({
-        stdout: null,
-        stderr: `Execution failed: ${message}`,
-        compile_output: null,
-        statusCode: 13,
-        statusDescription: 'Internal Error',
-        time: '0',
-        memory: 0,
-      });
-    }
+    return NextResponse.json({
+      stdout: result.stdout,
+      stderr: result.stderr,
+      compile_output: result.compileOutput,
+      statusCode: result.statusCode,
+      statusDescription: result.statusDescription,
+      time: result.time,
+      memory: result.memory,
+      activeLanguages: ACTIVE_LANGUAGES,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(

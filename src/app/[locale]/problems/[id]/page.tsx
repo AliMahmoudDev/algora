@@ -30,6 +30,7 @@ import {
   MemoryStick,
 } from 'lucide-react';
 import { getProblemById, difficultyConfig, type Problem } from '@/data/mock-problems';
+import { LANGUAGE_NAMES } from '@/lib/piston';
 
 // Dynamically import Monaco Editor (no SSR)
 const MonacoEditor = dynamic(() => import('@monaco-editor/react').then(mod => mod.default), {
@@ -320,6 +321,25 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
 
       const result = await response.json();
 
+      // Check if language is coming soon
+      if (result.statusDescription === 'Coming Soon') {
+        setOutput({
+          type: 'run',
+          stdout: null,
+          stderr: locale === 'ar'
+            ? `شغّل الكود بـ ${LANGUAGE_NAMES[language]} — قريباً! 🚧\n\nحالياً شغّل الكود بـ JavaScript بس. لغات تانية هتتفعّل قريباً.`
+            : `${LANGUAGE_NAMES[language]} execution — Coming Soon! 🚧\n\nCurrently only JavaScript code execution is available. Other languages will be supported soon.`,
+          compileOutput: null,
+          statusCode: 0,
+          statusDescription: 'Coming Soon',
+          time: '0',
+          memory: 0,
+        });
+        setConsoleTab('output');
+        setIsRunning(false);
+        return;
+      }
+
       setOutput({
         type: 'run',
         stdout: result.stdout,
@@ -372,6 +392,22 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
           });
 
           const result = await response.json();
+
+          // Check if language is coming soon
+          if (result.statusDescription === 'Coming Soon') {
+            allPassed = false;
+            testCaseResults.push({
+              testCaseIndex: i,
+              input: tc.input,
+              expectedOutput: tc.expectedOutput,
+              actualOutput: locale === 'ar' ? 'قريباً — JavaScript بس شغال حالياً' : 'Coming Soon — Only JS available',
+              passed: false,
+              time: '0',
+              memory: 0,
+            });
+            break;
+          }
+
           const actualOutput = (result.stdout || '').trim();
           const expectedOutput = tc.expectedOutput.trim();
           const passed = actualOutput === expectedOutput;
@@ -770,7 +806,7 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                   onMount={handleEditorMount}
                   options={{
                     fontSize: 14,
-                    fontFamily: 'var(--font-ibm-plex-mono), IBM Plex Mono, Menlo, Monaco, monospace',
+                    fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, Menlo, Monaco, monospace',
                     fontLigatures: true,
                     lineNumbers: 'on',
                     minimap: { enabled: false },
