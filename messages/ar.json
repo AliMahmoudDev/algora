@@ -7,6 +7,7 @@
     "signIn": "تسجيل الدخول",
     "signUp": "إنشاء حساب",
     "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
     "signOut": "تسجيل الخروج",
     "dashboard": "لوحة التحكم",
     "mobileMenu": "القائمة"
@@ -235,7 +236,17 @@
     "backToProblems": "العودة للمسائل",
     "progress": "تقدم",
     "submissionsThisWeek": "إرسالات هذا الأسبوع",
-    "activeDays": "أيام نشطة"
+    "activeDays": "أيام نشطة",
+    "of": "من"
+  },
+  "NotFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "backHome": "العودة للرئيسية",
+    "viewProblems": "تصفح المسائل"
+  },
+  "Loading": {
+    "loading": "جارٍ التحميل..."
   },
   "ProblemView": {
     "description": "الوصف",
@@ -275,6 +286,77 @@
     "wrongAnswer": "إجابة خاطئة",
     "runWithInput": "تشغيل مع مدخل",
     "outputTab": "المخرج",
-    "testCasesTab": "حالات الاختبار"
+    "testCasesTab": "حالات الاختبار",
+    "submissions": {
+      "title": "الإرسالات",
+      "noSubmissions": "لا توجد إرسالات بعد لهذه المسألة.",
+      "status": "الحالة",
+      "language": "اللغة",
+      "runtime": "وقت التشغيل",
+      "memory": "الذاكرة",
+      "timeAgo": "الوقت",
+      "code": "الكود",
+      "accepted": "مقبول",
+      "wrongAnswer": "إجابة خاطئة",
+      "tle": "تجاوز حد الوقت",
+      "viewCode": "عرض الكود",
+      "hideCode": "إخفاء الكود"
+    }
+  },
+  "Profile": {
+    "title": "الملف الشخصي",
+    "bio": "النبذة",
+    "editBio": "تعديل النبذة",
+    "saveBio": "حفظ النبذة",
+    "cancelBio": "إلغاء",
+    "joinDate": "تاريخ الانضمام",
+    "statsTitle": "الإحصائيات",
+    "problemsSolved": "مسائل محلولة",
+    "totalSubmissions": "إجمالي الإرسالات",
+    "successRate": "نسبة النجاح",
+    "currentStreak": "السلسلة الحالية",
+    "days": "أيام",
+    "activityCalendar": "تقويم النشاط",
+    "activityCalendarDesc": "نشاط حل المسائل خلال آخر 12 أسبوع",
+    "moreActivity": "المزيد",
+    "lessActivity": "أقل",
+    "skillTags": "وسوم المهارات",
+    "skillTagsDesc": "تصنيفات المسائل التي حللتها",
+    "noBio": "لا توجد نبذة بعد. اضغط تعديل لإضافة واحدة.",
+    "mon": "إثنين",
+    "tue": "ثلاثاء",
+    "wed": "أربعاء",
+    "thu": "خميس",
+    "fri": "جمعة",
+    "sat": "سبت",
+    "sun": "أحد"
+  },
+  "Settings": {
+    "title": "الإعدادات",
+    "accountSection": "الحساب",
+    "accountSectionDesc": "إدارة معلومات حسابك",
+    "displayName": "الاسم المعروض",
+    "email": "البريد الإلكتروني",
+    "emailReadOnly": "لا يمكن تغيير البريد الإلكتروني هنا",
+    "preferencesSection": "التفضيلات",
+    "preferencesSectionDesc": "خصص تجربتك",
+    "defaultEditorLanguage": "لغة المحرر الافتراضية",
+    "theme": "المظهر",
+    "darkOnly": "الوضع الداكن هو المظهر المتاح حالياً فقط",
+    "editorPreferences": "تفضيلات محرر الكود",
+    "editorPreferencesDesc": "تكوين إعدادات محرر الكود الخاص بك",
+    "fontSize": "حجم الخط",
+    "tabSize": "حجم المسافة البادئة",
+    "wordWrap": "التفاف الكلمات",
+    "enabled": "مفعّل",
+    "disabled": "معطّل",
+    "dangerZone": "منطقة الخطر",
+    "dangerZoneDesc": "إجراءات لا رجعة فيها وتدميرية",
+    "deleteAccount": "حذف الحساب",
+    "deleteAccountConfirm": "هل أنت متأكد من حذف حسابك؟ هذا الإجراء لا يمكن التراجع عنه.",
+    "deleteAccountWarning": "سيتم حذف حسابك وجميع البيانات المرتبطة به بشكل دائم.",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "settingsSaved": "تم حفظ الإعدادات بنجاح"
   }
 }

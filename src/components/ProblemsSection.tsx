@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -105,9 +106,10 @@ export default function ProblemsSection() {
           {problems.map((problem, index) => {
             const config = difficultyConfig[problem.difficulty];
             return (
-              <div
+              <Link
                 key={problem.id}
-                className="group bg-algora-card-bg rounded-xl border border-[rgba(255,255,255,0.08)] p-6 card-hover opacity-0 animate-fade-in-up cursor-pointer"
+                href={`/${locale}/problems/${problem.id}`}
+                className="block group bg-algora-card-bg rounded-xl border border-[rgba(255,255,255,0.08)] p-6 card-hover opacity-0 animate-fade-in-up cursor-pointer"
                 style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'forwards' }}
               >
                 <div className="flex items-start justify-between gap-4 mb-4">
@@ -154,17 +156,17 @@ export default function ProblemsSection() {
                     </span>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
 
         {/* View all link */}
         <div className="text-center mt-12">
-          <button className="inline-flex items-center gap-2 text-algora-gold hover:text-algora-gold/80 font-medium transition-colors group">
+          <Link href={`/${locale}/problems`} className="inline-flex items-center gap-2 text-algora-gold hover:text-algora-gold/80 font-medium transition-colors group">
             {t('viewAll')}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
+          </Link>
         </div>
       </div>
     </section>

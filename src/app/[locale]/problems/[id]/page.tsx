@@ -26,6 +26,8 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronRight,
+  Clock,
+  MemoryStick,
 } from 'lucide-react';
 import { getProblemById, difficultyConfig, type Problem } from '@/data/mock-problems';
 
@@ -79,6 +81,170 @@ interface ExecutionOutput {
   testCaseResults?: TestCaseResult[];
 }
 
+interface Submission {
+  id: number;
+  status: 'accepted' | 'wrongAnswer' | 'tle';
+  language: string;
+  runtime: string;
+  memory: string;
+  timeAgo: string;
+  code: string;
+}
+
+const mockSubmissionCodes: Record<string, Record<string, string[]>> = {
+  '1': {
+    python: [
+      `class Solution:
+    def twoSum(self, nums, target):
+        seen = {}
+        for i, num in enumerate(nums):
+            complement = target - num
+            if complement in seen:
+                return [seen[complement], i]
+            seen[num] = i
+        return []`,
+      `class Solution:
+    def twoSum(self, nums, target):
+        for i in range(len(nums)):
+            for j in range(i+1, len(nums)):
+                if nums[i] + nums[j] == target:
+                    return [i, j]
+        return []`,
+      `class Solution:
+    def twoSum(self, nums, target):
+        nums_sorted = sorted(enumerate(nums), key=lambda x: x[1])
+        left, right = 0, len(nums) - 1
+        while left < right:
+            s = nums_sorted[left][1] + nums_sorted[right][1]
+            if s == target:
+                return [nums_sorted[left][0], nums_sorted[right][0]]
+            elif s < target:
+                left += 1
+            else:
+                right -= 1
+        return []`,
+    ],
+    javascript: [],
+    cpp: [],
+    java: [],
+  },
+};
+
+const defaultCodes: Record<string, string> = {
+  python: `class Solution:
+    def solve(self):
+        # Your solution here
+        pass`,
+  javascript: `function solve() {
+    // Your solution here
+}`,
+  cpp: `class Solution {
+public:
+    int solve() {
+        // Your solution here
+        return 0;
+    }
+};`,
+  java: `class Solution {
+    public int solve() {
+        // Your solution here
+        return 0;
+    }
+}`,
+};
+
+const defaultSubmissions: Submission[] = [
+  {
+    id: 1,
+    status: 'accepted',
+    language: 'Python',
+    runtime: '0.04s',
+    memory: '15.2 MB',
+    timeAgo: '2h ago',
+    code: `class Solution:
+    def solve(self, nums, target):
+        seen = {}
+        for i, num in enumerate(nums):
+            complement = target - num
+            if complement in seen:
+                return [seen[complement], i]
+            seen[num] = i
+        return []`,
+  },
+  {
+    id: 2,
+    status: 'wrongAnswer',
+    language: 'JavaScript',
+    runtime: '0.08s',
+    memory: '42.1 MB',
+    timeAgo: '1d ago',
+    code: `function solve(nums, target) {
+    for (let i = 0; i < nums.length; i++) {
+        for (let j = i + 1; j < nums.length; j++) {
+            if (nums[i] + nums[j] === target) {
+                return [i, j];
+            }
+        }
+    }
+    return [];
+}`,
+  },
+  {
+    id: 3,
+    status: 'tle',
+    language: 'Python',
+    runtime: '2.01s',
+    memory: '14.8 MB',
+    timeAgo: '3d ago',
+    code: `class Solution:
+    def solve(self, nums, target):
+        from itertools import combinations
+        for combo in combinations(range(len(nums)), 2):
+            if nums[combo[0]] + nums[combo[1]] == target:
+                return list(combo)
+        return []`,
+  },
+];
+
+const timeAgoKeys: Record<string, string> = {
+  '2h ago': '2h',
+  '5h ago': '5h',
+  '1d ago': '1d',
+  '2d ago': '2d',
+  '3d ago': '3d',
+  '1w ago': '1w',
+};
+
+function getSubmissionsForProblem(problemId: string): Submission[] {
+  const codes = mockSubmissionCodes[problemId];
+  if (codes) {
+    const langs = ['python', 'javascript', 'cpp', 'java'];
+    const submissions: Submission[] = [];
+    let id = 1;
+    for (const lang of langs) {
+      const langCodes = codes[lang] || [];
+      for (const code of langCodes) {
+        const statusList: Submission['status'][] = ['accepted', 'wrongAnswer', 'tle'];
+        const status = statusList[(id - 1) % 3 === 0 ? 0 : (id - 1) % 3 === 1 ? 1 : 2];
+        const langName: Record<string, string> = { python: 'Python', javascript: 'JavaScript', cpp: 'C++', java: 'Java' };
+        const timeList = ['2h ago', '1d ago', '3d ago', '5h ago', '2d ago'];
+        submissions.push({
+          id,
+          status,
+          language: langName[lang] || lang,
+          runtime: `${(Math.random() * 0.5 + 0.01).toFixed(2)}s`,
+          memory: `${(Math.random() * 30 + 10).toFixed(1)} MB`,
+          timeAgo: timeList[(id - 1) % timeList.length],
+          code,
+        });
+        id++;
+      }
+    }
+    return submissions.length > 0 ? submissions : defaultSubmissions;
+  }
+  return defaultSubmissions;
+}
+
 export default function ProblemViewPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
   const { id } = use(params);
   const t = useTranslations('ProblemView');
@@ -94,10 +260,12 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [expandedTestCases, setExpandedTestCases] = useState<Set<number>>(new Set());
+  const [expandedSubmissions, setExpandedSubmissions] = useState<Set<number>>(new Set());
   const editorRef = useRef<unknown>(null);
   const consoleEndRef = useRef<HTMLDivElement>(null);
 
   const problem = getProblemById(id);
+  const submissions = getSubmissionsForProblem(id);
 
   useEffect(() => {
     consoleEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -339,7 +507,7 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                 value="submissions"
                 className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-algora-gold data-[state=active]:bg-transparent data-[state=active]:shadow-none text-algora-text-muted data-[state=active]:text-algora-gold h-full px-4 text-sm"
               >
-                Submissions (3)
+                {t('submissions.title')} ({submissions.length})
               </TabsTrigger>
             </TabsList>
 
@@ -427,12 +595,106 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
             </TabsContent>
 
             <TabsContent value="submissions" className="flex-1 overflow-y-auto p-5 md:p-6 mt-0">
-              <div className="text-sm text-algora-text-dim text-center py-12">
-                {isSupabaseConfigured 
-                  ? (locale === 'ar' ? 'قريباً - سجل الدخول لمشاهدة الإرسالات' : 'Coming soon — sign in to view submissions')
-                  : (locale === 'ar' ? 'قريباً — connect Supabase لتفعيل هذه الميزة' : 'Coming soon — connect Supabase to enable this feature')
-                }
-              </div>
+              {submissions.length > 0 ? (
+                <div className="space-y-3">
+                  {submissions.map((sub, idx) => {
+                    const statusConfig = {
+                      accepted: {
+                        color: 'text-algora-green',
+                        bg: 'bg-algora-green/10',
+                        border: 'border-algora-green/20',
+                        badgeBg: 'bg-algora-green/15 text-algora-green border-algora-green/30',
+                        icon: <CheckCircle2 className="w-4 h-4" />,
+                      },
+                      wrongAnswer: {
+                        color: 'text-algora-red',
+                        bg: 'bg-algora-red/10',
+                        border: 'border-algora-red/20',
+                        badgeBg: 'bg-algora-red/15 text-algora-red border-algora-red/30',
+                        icon: <XCircle className="w-4 h-4" />,
+                      },
+                      tle: {
+                        color: 'text-algora-gold',
+                        bg: 'bg-algora-gold/10',
+                        border: 'border-algora-gold/20',
+                        badgeBg: 'bg-algora-gold/15 text-algora-gold border-algora-gold/30',
+                        icon: <AlertTriangle className="w-4 h-4" />,
+                      },
+                    }[sub.status];
+
+                    const isExpanded = expandedSubmissions.has(sub.id);
+
+                    return (
+                      <div
+                        key={sub.id}
+                        className={`rounded-lg border overflow-hidden ${statusConfig.border} bg-[rgba(255,255,255,0.02)]`}
+                      >
+                        {/* Submission header */}
+                        <button
+                          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[rgba(255,255,255,0.03)] transition-colors"
+                          onClick={() => {
+                            setExpandedSubmissions(prev => {
+                              const next = new Set(prev);
+                              if (next.has(sub.id)) next.delete(sub.id);
+                              else next.add(sub.id);
+                              return next;
+                            });
+                          }}
+                        >
+                          {isExpanded ? (
+                            <ChevronDown className={`w-4 h-4 ${statusConfig.color} shrink-0`} />
+                          ) : (
+                            <ChevronRight className={`w-4 h-4 ${statusConfig.color} shrink-0`} />
+                          )}
+
+                          {/* Status Icon */}
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${statusConfig.bg}`}>
+                            {statusConfig.icon}
+                          </div>
+
+                          {/* Status text */}
+                          <span className={`text-xs font-semibold ${statusConfig.color} shrink-0`}>
+                            {sub.status === 'accepted' ? t('submissions.accepted') : sub.status === 'wrongAnswer' ? t('submissions.wrongAnswer') : t('submissions.tle')}
+                          </span>
+
+                          {/* Language */}
+                          <Badge className="bg-[rgba(255,255,255,0.06)] text-algora-text-muted border-[rgba(255,255,255,0.08)] text-[10px] border shrink-0">
+                            {sub.language}
+                          </Badge>
+
+                          {/* Runtime & Memory */}
+                          <div className="flex items-center gap-3 ms-auto text-[10px] text-algora-text-dim shrink-0">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {sub.runtime}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MemoryStick className="w-3 h-3" />
+                              {sub.memory}
+                            </span>
+                            <span className="text-[10px]">
+                              {sub.timeAgo}
+                            </span>
+                          </div>
+                        </button>
+
+                        {/* Expanded code view */}
+                        {isExpanded && (
+                          <div className="px-4 py-3 border-t border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.01)]">
+                            <pre className="text-xs text-algora-text-primary font-mono whitespace-pre-wrap leading-5 bg-[rgba(255,255,255,0.03)] p-3 rounded-lg border border-[rgba(255,255,255,0.06)] max-h-64 overflow-y-auto">
+                              {sub.code}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-sm text-algora-text-dim text-center py-12">
+                  {t('submissions.noSubmissions')}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

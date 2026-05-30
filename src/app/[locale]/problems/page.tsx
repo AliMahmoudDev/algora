@@ -23,6 +23,8 @@ import {
   X,
   SlidersHorizontal,
 } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { mockProblems, difficultyOrder, difficultyConfig, categoryList, type Difficulty, type ProblemStatus } from '@/data/mock-problems';
 
 const ITEMS_PER_PAGE = 6;
@@ -115,6 +117,11 @@ export default function ProblemsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0D0D12]">
+      <Navbar />
+
+      {/* Spacer for fixed navbar */}
+      <div className="h-16 md:h-20 bg-[#0D0D12]" />
+
       {/* Header */}
       <div className="border-b border-[rgba(255,255,255,0.08)] bg-[#0D0D12]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
@@ -445,6 +452,7 @@ export default function ProblemsPage() {
           </>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

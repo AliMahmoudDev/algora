@@ -14,7 +14,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from '@/components/ui/avatar';
-import { Menu, X, Globe, LogOut, User } from 'lucide-react';
+import { Menu, X, Globe, LogOut, User, Settings } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
@@ -74,6 +74,7 @@ export default function Navbar() {
     ? [
         { label: t('home'), href: `/${locale}` },
         { label: t('dashboard'), href: `/${locale}/dashboard` },
+        { label: t('profile'), href: `/${locale}/profile` },
         { label: t('problems'), href: `/${locale}/problems` },
         { label: t('features'), href: `/${locale}#features` },
         { label: t('about'), href: `/${locale}#how-it-works` },
@@ -157,10 +158,17 @@ export default function Navbar() {
                   <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
                   <DropdownMenuItem
                     className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
-                    onClick={() => router.push(`/${locale}/dashboard`)}
+                    onClick={() => router.push(`/${locale}/profile`)}
                   >
                     <User className="w-4 h-4 me-2" />
                     {t('profile')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
+                    onClick={() => router.push(`/${locale}/settings`)}
+                  >
+                    <Settings className="w-4 h-4 me-2" />
+                    {t('settings')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
                   <DropdownMenuItem

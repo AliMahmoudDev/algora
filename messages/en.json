@@ -7,6 +7,7 @@
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "profile": "Profile",
+    "settings": "Settings",
     "signOut": "Sign Out",
     "dashboard": "Dashboard",
     "mobileMenu": "Toggle menu"
@@ -235,7 +236,17 @@
     "backToProblems": "Back to Problems",
     "progress": "progress",
     "submissionsThisWeek": "submissions this week",
-    "activeDays": "active days"
+    "activeDays": "active days",
+    "of": "of"
+  },
+  "NotFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "backHome": "Go back home",
+    "viewProblems": "View Problems"
+  },
+  "Loading": {
+    "loading": "Loading..."
   },
   "ProblemView": {
     "description": "Description",
@@ -275,6 +286,77 @@
     "wrongAnswer": "Wrong Answer",
     "runWithInput": "Run with input",
     "outputTab": "Output",
-    "testCasesTab": "Test Cases"
+    "testCasesTab": "Test Cases",
+    "submissions": {
+      "title": "Submissions",
+      "noSubmissions": "No submissions yet for this problem.",
+      "status": "Status",
+      "language": "Language",
+      "runtime": "Runtime",
+      "memory": "Memory",
+      "timeAgo": "Time",
+      "code": "Code",
+      "accepted": "Accepted",
+      "wrongAnswer": "Wrong Answer",
+      "tle": "Time Limit Exceeded",
+      "viewCode": "View Code",
+      "hideCode": "Hide Code"
+    }
+  },
+  "Profile": {
+    "title": "Profile",
+    "bio": "Bio",
+    "editBio": "Edit Bio",
+    "saveBio": "Save Bio",
+    "cancelBio": "Cancel",
+    "joinDate": "Joined",
+    "statsTitle": "Statistics",
+    "problemsSolved": "Problems Solved",
+    "totalSubmissions": "Total Submissions",
+    "successRate": "Success Rate",
+    "currentStreak": "Current Streak",
+    "days": "days",
+    "activityCalendar": "Activity Calendar",
+    "activityCalendarDesc": "Your problem-solving activity over the last 12 weeks",
+    "moreActivity": "more",
+    "lessActivity": "less",
+    "skillTags": "Skill Tags",
+    "skillTagsDesc": "Problem categories you have solved",
+    "noBio": "No bio yet. Click edit to add one.",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "Settings": {
+    "title": "Settings",
+    "accountSection": "Account",
+    "accountSectionDesc": "Manage your account information",
+    "displayName": "Display Name",
+    "email": "Email",
+    "emailReadOnly": "Email cannot be changed here",
+    "preferencesSection": "Preferences",
+    "preferencesSectionDesc": "Customize your experience",
+    "defaultEditorLanguage": "Default Editor Language",
+    "theme": "Theme",
+    "darkOnly": "Dark mode is currently the only available theme",
+    "editorPreferences": "Code Editor Preferences",
+    "editorPreferencesDesc": "Configure your code editor settings",
+    "fontSize": "Font Size",
+    "tabSize": "Tab Size",
+    "wordWrap": "Word Wrap",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "dangerZone": "Danger Zone",
+    "dangerZoneDesc": "Irreversible and destructive actions",
+    "deleteAccount": "Delete Account",
+    "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
+    "deleteAccountWarning": "This will permanently delete your account and all associated data.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "settingsSaved": "Settings saved successfully"
   }
 }
