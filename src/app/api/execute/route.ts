@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { executeCode, PISTON_LANGUAGES, PISTON_LANGUAGE_NAMES } from '@/lib/piston';
+import { executeCode, LANGUAGE_NAMES, SUPPORTED_LANGUAGES } from '@/lib/piston';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,10 +13,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const langConfig = PISTON_LANGUAGES[language];
-    if (!langConfig) {
+    if (!SUPPORTED_LANGUAGES.includes(language)) {
       return NextResponse.json(
-        { error: `Unsupported language: ${language}. Supported: ${Object.keys(PISTON_LANGUAGES).join(', ')}` },
+        { error: `Unsupported language: ${language}. Supported: ${SUPPORTED_LANGUAGES.join(', ')}` },
         { status: 400 }
       );
     }
@@ -33,12 +32,11 @@ export async function POST(request: NextRequest) {
         time: result.time,
         memory: result.memory,
       });
-    } catch (pistonError) {
-      const message = pistonError instanceof Error ? pistonError.message : 'Unknown Piston error';
-
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       return NextResponse.json({
         stdout: null,
-        stderr: `Piston API unavailable: ${message}\n\nPlease try again later.`,
+        stderr: `Execution failed: ${message}`,
         compile_output: null,
         statusCode: 13,
         statusDescription: 'Internal Error',
