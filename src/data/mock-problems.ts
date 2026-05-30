@@ -104,19 +104,9 @@ export const mockProblems: Problem[] = [
     starterCode: {
       python: `class Solution:
     def twoSum(self, nums, target):
-        """
-        :type nums: List[int]
-        :type target: int
-        :rtype: List[int]
-        """
         # Write your solution here
         pass`,
-      javascript: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-function twoSum(nums, target) {
+      javascript: `function twoSum(nums, target) {
     // Write your solution here
 }`,
       cpp: `#include <vector>
@@ -165,18 +155,10 @@ public:
     orderIndex: 2,
     starterCode: {
       python: `class Solution:
-    def isPalindrome(self, s: str) -> bool:
-        """
-        :type s: str
-        :rtype: bool
-        """
+    def isPalindrome(self, s):
         # Write your solution here
         pass`,
-      javascript: `/**
- * @param {string} s
- * @return {boolean}
- */
-function isPalindrome(s) {
+      javascript: `function isPalindrome(s) {
     // Write your solution here
 }`,
       cpp: `#include <string>
@@ -224,19 +206,9 @@ public:
     starterCode: {
       python: `class Solution:
     def search(self, nums, target):
-        """
-        :type nums: List[int]
-        :type target: int
-        :rtype: int
-        """
         # Write your solution here
         pass`,
-      javascript: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number}
- */
-function search(nums, target) {
+      javascript: `function search(nums, target) {
     // Write your solution here
 }`,
       cpp: `#include <vector>
@@ -284,17 +256,9 @@ public:
     starterCode: {
       python: `class Solution:
     def maxSubArray(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: int
-        """
         # Write your solution here (Kadane's Algorithm)
         pass`,
-      javascript: `/**
- * @param {number[]} nums
- * @return {number}
- */
-function maxSubArray(nums) {
+      javascript: `function maxSubArray(nums) {
     // Write your solution here (Kadane's Algorithm)
 }`,
       cpp: `#include <vector>
@@ -342,18 +306,10 @@ public:
     orderIndex: 5,
     starterCode: {
       python: `class Solution:
-    def longestPalindrome(self, s: str) -> str:
-        """
-        :type s: str
-        :rtype: str
-        """
+    def longestPalindrome(self, s):
         # Write your solution here
         pass`,
-      javascript: `/**
- * @param {string} s
- * @return {string}
- */
-function longestPalindrome(s) {
+      javascript: `function longestPalindrome(s) {
     // Write your solution here
 }`,
       cpp: `#include <string>
@@ -400,17 +356,9 @@ public:
     starterCode: {
       python: `class Solution:
     def productExceptSelf(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: List[int]
-        """
         # Write your solution here (O(n) without division)
         pass`,
-      javascript: `/**
- * @param {number[]} nums
- * @return {number[]}
- */
-function productExceptSelf(nums) {
+      javascript: `function productExceptSelf(nums) {
     // Write your solution here (O(n) without division)
 }`,
       cpp: `#include <vector>
@@ -458,17 +406,9 @@ public:
     starterCode: {
       python: `class Solution:
     def threeSum(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: List[List[int]]
-        """
         # Write your solution here
         pass`,
-      javascript: `/**
- * @param {number[]} nums
- * @return {number[][]}
- */
-function threeSum(nums) {
+      javascript: `function threeSum(nums) {
     // Write your solution here
 }`,
       cpp: `#include <vector>
@@ -518,18 +458,10 @@ class Solution {
     starterCode: {
       python: `class Solution:
     def maxArea(self, height):
-        """
-        :type height: List[int]
-        :rtype: int
-        """
-        # Write your solution here (Two Pointers approach)
+        # Write your solution here (Two Pointers)
         pass`,
-      javascript: `/**
- * @param {number[]} height
- * @return {number}
- */
-function maxArea(height) {
-    // Write your solution here (Two Pointers approach)
+      javascript: `function maxArea(height) {
+    // Write your solution here (Two Pointers)
 }`,
       cpp: `#include <vector>
 #include <algorithm>
@@ -582,25 +514,10 @@ public:
 #         self.next = next
 
 class Solution:
-    def mergeKLists(self, lists: list) -> list:
-        """
-        :type lists: List[ListNode]
-        :rtype: ListNode
-        """
+    def mergeKLists(self, lists):
         # Write your solution here
         pass`,
-      javascript: `/**
- * Definition for singly-linked list.
- * function ListNode(val, next) {
- *     this.val = (val===undefined ? 0 : val)
- *     this.next = (next===undefined ? null : next)
- * }
- */
-/**
- * @param {ListNode[]} lists
- * @return {ListNode}
- */
-function mergeKLists(lists) {
+      javascript: `function mergeKLists(lists) {
     // Write your solution here
 }`,
       cpp: `#include <vector>
@@ -666,19 +583,9 @@ class Solution {
     starterCode: {
       python: `class Solution:
     def findMedianSortedArrays(self, nums1, nums2):
-        """
-        :type nums1: List[int]
-        :type nums2: List[int]
-        :rtype: float
-        """
         # Write your solution here (O(log(m+n)))
         pass`,
-      javascript: `/**
- * @param {number[]} nums1
- * @param {number[]} nums2
- * @return {number}
- */
-function findMedianSortedArrays(nums1, nums2) {
+      javascript: `function findMedianSortedArrays(nums1, nums2) {
     // Write your solution here (O(log(m+n)))
 }`,
       cpp: `#include <vector>
@@ -724,18 +631,10 @@ public:
     orderIndex: 11,
     starterCode: {
       python: `class Solution:
-    def climbStairs(self, n: int) -> int:
-        """
-        :type n: int
-        :rtype: int
-        """
+    def climbStairs(self, n):
         # Write your solution here (Fibonacci approach)
         pass`,
-      javascript: `/**
- * @param {number} n
- * @return {number}
- */
-function climbStairs(n) {
+      javascript: `function climbStairs(n) {
     // Write your solution here (Fibonacci approach)
 }`,
       cpp: `class Solution {
@@ -794,27 +693,15 @@ public:
 # obj = LRUCache(capacity)
 # param_1 = obj.get(key)
 # obj.put(key, value)`,
-      javascript: `/**
- * @param {number} capacity
- */
-var LRUCache = function(capacity) {
+      javascript: `var LRUCache = function(capacity) {
     this.capacity = capacity;
     // Write your solution here
 };
 
-/**
- * @param {number} key
- * @return {number}
- */
 LRUCache.prototype.get = function(key) {
     // Write your solution here
 };
 
-/**
- * @param {number} key
- * @param {number} value
- * @return {void}
- */
 LRUCache.prototype.put = function(key, value) {
     // Write your solution here
 };`,
@@ -886,25 +773,10 @@ class LRUCache {
 #         self.next = next
 
 class Solution:
-    def reverseList(self, head) -> list:
-        """
-        :type head: ListNode
-        :rtype: ListNode
-        """
+    def reverseList(self, head):
         # Write your solution here (iterative or recursive)
         pass`,
-      javascript: `/**
- * Definition for singly-linked list.
- * function ListNode(val, next) {
- *     this.val = (val===undefined ? 0 : val)
- *     this.next = (next===undefined ? null : next)
- * }
- */
-/**
- * @param {ListNode} head
- * @return {ListNode}
- */
-function reverseList(head) {
+      javascript: `function reverseList(head) {
     // Write your solution here (iterative or recursive)
 }`,
       cpp: `#include <vector>
@@ -968,19 +840,9 @@ class Solution {
     starterCode: {
       python: `class Solution:
     def exist(self, board, word):
-        """
-        :type board: List[List[str]]
-        :type word: str
-        :rtype: bool
-        """
         # Write your solution here (Backtracking)
         pass`,
-      javascript: `/**
- * @param {character[][]} board
- * @param {string} word
- * @return {boolean}
- */
-function exist(board, word) {
+      javascript: `function exist(board, word) {
     // Write your solution here (Backtracking)
 }`,
       cpp: `#include <vector>
