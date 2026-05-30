@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { executeCode, JUDGE0_LANGUAGE_IDS } from '@/lib/judge0';
+import { executeCode, PISTON_LANGUAGES, PISTON_LANGUAGE_NAMES } from '@/lib/piston';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const languageId = JUDGE0_LANGUAGE_IDS[language];
-    if (!languageId) {
+    const langConfig = PISTON_LANGUAGES[language];
+    if (!langConfig) {
       return NextResponse.json(
-        { error: `Unsupported language: ${language}. Supported: ${Object.keys(JUDGE0_LANGUAGE_IDS).join(', ')}` },
+        { error: `Unsupported language: ${language}. Supported: ${Object.keys(PISTON_LANGUAGES).join(', ')}` },
         { status: 400 }
       );
     }
@@ -33,13 +33,12 @@ export async function POST(request: NextRequest) {
         time: result.time,
         memory: result.memory,
       });
-    } catch (judgeError) {
-      const message = judgeError instanceof Error ? judgeError.message : 'Unknown Judge0 error';
-      
-      // If Judge0 is unavailable, return a simulated response
+    } catch (pistonError) {
+      const message = pistonError instanceof Error ? pistonError.message : 'Unknown Piston error';
+
       return NextResponse.json({
         stdout: null,
-        stderr: `Judge0 API unavailable: ${message}\n\nNote: Make sure JUDGE0_API_KEY is set in your environment.`,
+        stderr: `Piston API unavailable: ${message}\n\nPlease try again later.`,
         compile_output: null,
         statusCode: 13,
         statusDescription: 'Internal Error',
