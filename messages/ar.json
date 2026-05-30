@@ -270,6 +270,7 @@
     "submitting": "جارٍ الإرسال...",
     "testCases": "حالات الاختبار",
     "passed": "نجح",
+    "expected": "المتوقع",
     "failed": "فشل",
     "testCase": "حالة اختبار",
     "executionError": "خطأ في التنفيذ",

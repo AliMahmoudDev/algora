@@ -270,6 +270,7 @@
     "submitting": "Submitting...",
     "testCases": "Test Cases",
     "passed": "Passed",
+    "expected": "Expected",
     "failed": "Failed",
     "testCase": "Test Case",
     "executionError": "Execution Error",

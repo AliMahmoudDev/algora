@@ -971,7 +971,7 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                                 <pre className="text-xs text-algora-text-primary font-mono mt-0.5 bg-[rgba(255,255,255,0.02)] p-1.5 rounded">{tc.actualOutput || '(empty)'}</pre>
                               </div>
                               <div>
-                                <span className="text-[10px] text-algora-text-dim uppercase tracking-wider">{t('passed')}:</span>
+                                <span className="text-[10px] text-algora-text-dim uppercase tracking-wider">{t('expected')}:</span>
                                 <pre className="text-xs text-algora-green font-mono mt-0.5 bg-[rgba(16,185,129,0.03)] p-1.5 rounded">{tc.expectedOutput}</pre>
                               </div>
                             </div>
