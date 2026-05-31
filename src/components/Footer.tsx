@@ -1,40 +1,33 @@
-'use client';
-
 import Image from 'next/image';
-import { useTranslations, useLocale } from 'next-intl';
-import { type Locale } from '@/i18n/routing';
+
+const footerLinks = [
+  {
+    title: 'Platform',
+    links: [
+      { label: 'Problems', href: '#problems' },
+      { label: 'Features', href: '#features' },
+      { label: 'Pricing', href: '#' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { label: 'Documentation', href: '#' },
+      { label: 'Blog', href: '#' },
+      { label: 'Community', href: '#' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About', href: '#how-it-works' },
+      { label: 'Contact', href: '#' },
+      { label: 'Privacy', href: '#' },
+    ],
+  },
+];
 
 export default function Footer() {
-  const t = useTranslations('Footer');
-  const locale = useLocale() as Locale;
-
-  const footerLinks = [
-    {
-      titleKey: 'platform',
-      links: [
-        { labelKey: 'problems', href: `/${locale}/problems` },
-        { labelKey: 'features', href: `#features` },
-        { labelKey: 'pricing', href: '#' },
-      ],
-    },
-    {
-      titleKey: 'resources',
-      links: [
-        { labelKey: 'documentation', href: '#' },
-        { labelKey: 'blog', href: '#' },
-        { labelKey: 'community', href: '#' },
-      ],
-    },
-    {
-      titleKey: 'company',
-      links: [
-        { labelKey: 'about', href: `/${locale}#how-it-works` },
-        { labelKey: 'contact', href: '#' },
-        { labelKey: 'privacy', href: '#' },
-      ],
-    },
-  ];
-
   return (
     <footer className="relative border-t border-[rgba(255,255,255,0.08)]">
       {/* Background */}
@@ -44,7 +37,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <a href={`/${locale}`} className="flex items-center gap-2.5 mb-4">
+            <a href="#home" className="flex items-center gap-2.5 mb-4">
               <Image
                 src="/algora_logo.png"
                 alt="Algora"
@@ -57,24 +50,25 @@ export default function Footer() {
               </span>
             </a>
             <p className="text-algora-text-dim text-sm leading-relaxed max-w-xs">
-              {t('description')}
+              A bilingual algorithms education platform with AI-powered learning
+              assistance.
             </p>
           </div>
 
           {/* Link columns */}
           {footerLinks.map((col) => (
-            <div key={col.titleKey}>
+            <div key={col.title}>
               <h4 className="text-sm font-semibold text-algora-text-primary mb-4">
-                {t(col.titleKey)}
+                {col.title}
               </h4>
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
-                  <li key={link.labelKey}>
+                  <li key={link.label}>
                     <a
                       href={link.href}
                       className="text-sm text-algora-text-dim hover:text-algora-gold transition-colors"
                     >
-                      {t(link.labelKey)}
+                      {link.label}
                     </a>
                   </li>
                 ))}
@@ -86,12 +80,12 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-[rgba(255,255,255,0.06)] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-algora-text-dim text-sm">
-            {t('copyright')}
+            © 2026 Algora. All rights reserved.
           </p>
           <div className="flex items-center gap-1.5 text-algora-text-dim text-sm">
-            {t('builtWith')}
+            Built with
             <span className="text-algora-red mx-0.5">♥</span>
-            {locale === 'ar' ? 'لمجتمع الخوارزميات' : 'for the algorithmic community'}
+            for the algorithmic community
           </div>
         </div>
       </div>

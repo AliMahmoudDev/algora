@@ -23,8 +23,6 @@ import {
   X,
   SlidersHorizontal,
 } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { mockProblems, difficultyOrder, difficultyConfig, categoryList, type Difficulty, type ProblemStatus } from '@/data/mock-problems';
 
 const ITEMS_PER_PAGE = 6;
@@ -117,16 +115,11 @@ export default function ProblemsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0D0D12]">
-      <Navbar />
-
-      {/* Spacer for fixed navbar */}
-      <div className="h-16 md:h-20 bg-[#0D0D12]" />
-
       {/* Header */}
       <div className="border-b border-[rgba(255,255,255,0.08)] bg-[#0D0D12]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <h1 className="text-2xl md:text-3xl font-bold text-algora-text-primary mb-2">
-            {t('pageTitle')}
+            {t('title')}
           </h1>
           <p className="text-algora-text-muted text-sm md:text-base">
             {t('subtitle')}
@@ -205,7 +198,7 @@ export default function ProblemsPage() {
                   <SelectItem value="order">#</SelectItem>
                   <SelectItem value="difficulty">{t('difficulty')}</SelectItem>
                   <SelectItem value="acceptance">{t('acceptanceRate')}</SelectItem>
-                  <SelectItem value="title">{t('titleCol')}</SelectItem>
+                  <SelectItem value="title">{t('title')}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -269,7 +262,7 @@ export default function ProblemsPage() {
                   <SelectItem value="order">#</SelectItem>
                   <SelectItem value="difficulty">{t('difficulty')}</SelectItem>
                   <SelectItem value="acceptance">{t('acceptanceRate')}</SelectItem>
-                  <SelectItem value="title">{t('titleCol')}</SelectItem>
+                  <SelectItem value="title">{t('title')}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -308,7 +301,7 @@ export default function ProblemsPage() {
                 <thead>
                   <tr className="bg-[rgba(255,255,255,0.02)] border-b border-[rgba(255,255,255,0.08)]">
                     <th className="w-16 px-4 py-3 text-start text-xs font-medium text-algora-text-dim uppercase tracking-wider">Status</th>
-                    <th className="px-4 py-3 text-start text-xs font-medium text-algora-text-dim uppercase tracking-wider">{t('titleCol')}</th>
+                    <th className="px-4 py-3 text-start text-xs font-medium text-algora-text-dim uppercase tracking-wider">{t('title')}</th>
                     <th className="px-4 py-3 text-start text-xs font-medium text-algora-text-dim uppercase tracking-wider">{t('difficultyLabel')}</th>
                     <th className="px-4 py-3 text-start text-xs font-medium text-algora-text-dim uppercase tracking-wider">{t('categoryLabel')}</th>
                     <th className="w-28 px-4 py-3 text-start text-xs font-medium text-algora-text-dim uppercase tracking-wider">{t('acceptanceLabel')}</th>
@@ -452,7 +445,6 @@ export default function ProblemsPage() {
           </>
         )}
       </main>
-      <Footer />
     </div>
   );
 }

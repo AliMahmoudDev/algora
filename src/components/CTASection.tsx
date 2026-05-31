@@ -2,13 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
-import { type Locale } from '@/i18n/routing';
 
 export default function CTASection() {
-  const t = useTranslations('CTASection');
-  const locale = useLocale() as Locale;
-
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background */}
@@ -28,13 +23,14 @@ export default function CTASection() {
 
         {/* Headline */}
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-          {t('title')}{' '}
-          <span className="gradient-text-gold">{t('titleHighlight')}</span>?
+          Ready to Start Your{' '}
+          <span className="gradient-text-gold">Journey</span>?
         </h2>
 
         {/* Description */}
         <p className="text-algora-text-muted text-lg md:text-xl max-w-2xl mx-auto mb-10">
-          {t('description')}
+          Join hundreds of learners mastering algorithms with AI-powered guidance.
+          Available in Arabic and English, 24/7.
         </p>
 
         {/* CTA Buttons */}
@@ -42,18 +38,15 @@ export default function CTASection() {
           <Button
             size="lg"
             className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold text-base px-8 gold-glow rounded-lg group"
-            asChild
           >
-            <a href={`/${locale}/auth/signup`}>
-              {t('getStarted')}
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
+            Get Started — It&apos;s Free
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
 
         {/* Small trust note */}
         <p className="text-algora-text-dim text-sm mt-6">
-          {t('noCreditCard')}
+          No credit card required · Free forever · Start solving in seconds
         </p>
       </div>
     </section>

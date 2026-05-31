@@ -1,42 +1,39 @@
 'use client';
 
 import { BookOpen, Languages, Bot, Clock } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+
+const stats = [
+  {
+    value: '50+',
+    label: 'And Growing',
+    description: 'Algorithmic Problems',
+    icon: BookOpen,
+    color: 'text-algora-gold',
+  },
+  {
+    value: '2',
+    label: 'Arabic + English',
+    description: 'Languages Supported',
+    icon: Languages,
+    color: 'text-algora-green',
+  },
+  {
+    value: 'AI',
+    label: 'Powered Assistant',
+    description: 'Smart Explanations',
+    icon: Bot,
+    color: 'text-algora-purple',
+  },
+  {
+    value: '24/7',
+    label: 'Always Available',
+    description: 'Learn Anytime',
+    icon: Clock,
+    color: 'text-algora-red',
+  },
+];
 
 export default function StatsSection() {
-  const t = useTranslations('StatsSection');
-
-  const stats = [
-    {
-      value: '50+',
-      labelKey: 'andGrowing',
-      descriptionKey: 'algorithmicProblems',
-      icon: BookOpen,
-      color: 'text-algora-gold',
-    },
-    {
-      value: '2',
-      labelKey: 'arabicEnglish',
-      descriptionKey: 'languagesSupported',
-      icon: Languages,
-      color: 'text-algora-green',
-    },
-    {
-      value: 'AI',
-      labelKey: 'poweredAssistant',
-      descriptionKey: 'smartExplanations',
-      icon: Bot,
-      color: 'text-algora-purple',
-    },
-    {
-      value: '24/7',
-      labelKey: 'alwaysAvailable',
-      descriptionKey: 'learnAnytime',
-      icon: Clock,
-      color: 'text-algora-red',
-    },
-  ];
-
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background */}
@@ -50,7 +47,7 @@ export default function StatsSection() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, index) => (
             <div
-              key={stat.labelKey}
+              key={stat.label}
               className="text-center opacity-0 animate-fade-in-up"
               style={{ animationDelay: `${index * 0.15}s`, animationFillMode: 'forwards' }}
             >
@@ -66,12 +63,12 @@ export default function StatsSection() {
 
               {/* Label */}
               <div className="text-algora-text-primary font-medium text-sm md:text-base mb-1">
-                {t(stat.labelKey)}
+                {stat.label}
               </div>
 
               {/* Description */}
               <div className="text-algora-text-dim text-xs md:text-sm">
-                {t(stat.descriptionKey)}
+                {stat.description}
               </div>
             </div>
           ))}

@@ -2,8 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Play } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
-import { type Locale } from '@/i18n/routing';
 
 const codeLines = [
   { text: 'function twoSum(nums, target) {', color: 'text-algora-purple' },
@@ -19,9 +17,6 @@ const codeLines = [
 ];
 
 export default function HeroSection() {
-  const t = useTranslations('HeroSection');
-  const locale = useLocale() as Locale;
-
   return (
     <section
       id="home"
@@ -55,55 +50,50 @@ export default function HeroSection() {
           <div className="text-center lg:text-left space-y-6 md:space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-algora-card-bg border border-[rgba(255,255,255,0.08)] text-sm text-algora-text-muted animate-fade-in-up">
               <span className="w-2 h-2 rounded-full bg-algora-green animate-pulse" />
-              {t('badge')}
+              Now with AI-Powered Assistance
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight animate-fade-in-up delay-100">
-              {t('title1')}
+              Master Algorithms.
               <br />
-              <span className="gradient-text-gold">{t('title2')}</span>
+              <span className="gradient-text-gold">Code the Future.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-algora-text-muted max-w-lg mx-auto lg:mx-0 animate-fade-in-up delay-200">
-              {t('description')}
+              A bilingual learning platform for algorithms and problem-solving.
+              Available in Arabic & English with AI-powered guidance.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up delay-300">
               <Button
                 size="lg"
                 className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold text-base px-8 gold-glow rounded-lg group"
-                asChild
               >
-                <a href={`/${locale}/problems`}>
-                  {t('startSolving')}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </a>
+                Start Solving
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="border-[rgba(255,255,255,0.15)] text-algora-text-primary hover:bg-algora-card-bg hover:border-algora-gold/30 font-semibold text-base px-8 rounded-lg group"
-                asChild
               >
-                <a href={`/${locale}/problems`}>
-                  <Play className="w-4 h-4" />
-                  {t('viewProblems')}
-                </a>
+                <Play className="w-4 h-4" />
+                View Problems
               </Button>
             </div>
 
             {/* Trust indicators */}
             <div className="flex items-center gap-6 justify-center lg:justify-start pt-4 animate-fade-in-up delay-400">
               <div className="flex items-center gap-2 text-sm text-algora-text-dim">
-                <span className="font-semibold text-algora-text-muted">50+</span> {t('problems')}
+                <span className="font-semibold text-algora-text-muted">50+</span> Problems
               </div>
               <div className="w-px h-4 bg-[rgba(255,255,255,0.1)]" />
               <div className="flex items-center gap-2 text-sm text-algora-text-dim">
-                <span className="font-semibold text-algora-text-muted">2</span> {t('languages')}
+                <span className="font-semibold text-algora-text-muted">2</span> Languages
               </div>
               <div className="w-px h-4 bg-[rgba(255,255,255,0.1)]" />
               <div className="flex items-center gap-2 text-sm text-algora-text-dim">
-                <span className="font-semibold text-algora-text-muted">{t('powered')}</span> {t('poweredAssistant').split(' ')[0]}
+                <span className="font-semibold text-algora-text-muted">AI</span> Powered
               </div>
             </div>
           </div>

@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Cairo, JetBrains_Mono } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { Toaster } from "@/components/ui/toaster";
+import AuthProvider from "@/components/providers/session-provider";
 
-const cairo = Cairo({
-  variable: "--font-cairo",
-  subsets: ["latin", "arabic"],
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -92,10 +93,12 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
       <body
-        className={`${cairo.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${inter.variable} ${ibmPlexMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <Toaster />
         </NextIntlClientProvider>
       </body>

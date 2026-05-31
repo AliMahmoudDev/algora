@@ -8,18 +8,6 @@ export interface Example {
   explanationAr?: string;
 }
 
-export interface StarterCode {
-  python: string;
-  javascript: string;
-  cpp: string;
-  java: string;
-}
-
-export interface TestCase {
-  input: string;
-  expectedOutput: string;
-}
-
 export interface Problem {
   id: string;
   title: string;
@@ -36,8 +24,6 @@ export interface Problem {
   acceptanceRate: number;
   status: ProblemStatus;
   orderIndex: number;
-  starterCode: StarterCode;
-  testCases: TestCase[];
 }
 
 export const difficultyOrder: Record<Difficulty, number> = {
@@ -101,37 +87,6 @@ export const mockProblems: Problem[] = [
     acceptanceRate: 78.5,
     status: 'Solved',
     orderIndex: 1,
-    starterCode: {
-      python: `class Solution:
-    def twoSum(self, nums, target):
-        # Write your solution here
-        pass`,
-      javascript: `function twoSum(nums, target) {
-    // Write your solution here
-}`,
-      cpp: `#include <vector>
-#include <unordered_map>
-using namespace std;
-
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        // Write your solution here
-        return {};
-    }
-};`,
-      java: `class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        // Write your solution here
-        return new int[]{};
-    }
-}`,
-    },
-    testCases: [
-      { input: '2\n7\n11\n15\n9', expectedOutput: '0 1' },
-      { input: '3\n2\n4\n6', expectedOutput: '1 2' },
-      { input: '3\n3\n3\n6', expectedOutput: '0 1' },
-    ],
   },
   {
     id: '2',
@@ -153,36 +108,6 @@ public:
     acceptanceRate: 62.3,
     status: 'Solved',
     orderIndex: 2,
-    starterCode: {
-      python: `class Solution:
-    def isPalindrome(self, s):
-        # Write your solution here
-        pass`,
-      javascript: `function isPalindrome(s) {
-    // Write your solution here
-}`,
-      cpp: `#include <string>
-using namespace std;
-
-class Solution {
-public:
-    bool isPalindrome(string s) {
-        // Write your solution here
-        return false;
-    }
-};`,
-      java: `class Solution {
-    public boolean isPalindrome(String s) {
-        // Write your solution here
-        return false;
-    }
-}`,
-    },
-    testCases: [
-      { input: 'A man, a plan, a canal: Panama', expectedOutput: 'true' },
-      { input: 'race a car', expectedOutput: 'false' },
-      { input: ' ', expectedOutput: 'true' },
-    ],
   },
   {
     id: '3',
@@ -203,35 +128,6 @@ public:
     acceptanceRate: 85.2,
     status: 'Not Started',
     orderIndex: 3,
-    starterCode: {
-      python: `class Solution:
-    def search(self, nums, target):
-        # Write your solution here
-        pass`,
-      javascript: `function search(nums, target) {
-    // Write your solution here
-}`,
-      cpp: `#include <vector>
-using namespace std;
-
-class Solution {
-public:
-    int search(vector<int>& nums, int target) {
-        // Write your solution here
-        return -1;
-    }
-};`,
-      java: `class Solution {
-    public int search(int[] nums, int target) {
-        // Write your solution here
-        return -1;
-    }
-}`,
-    },
-    testCases: [
-      { input: '6\n-1\n0\n3\n5\n9\n12\n9', expectedOutput: '4' },
-      { input: '6\n-1\n0\n3\n5\n9\n12\n2', expectedOutput: '-1' },
-    ],
   },
   {
     id: '4',
@@ -253,37 +149,6 @@ public:
     acceptanceRate: 54.8,
     status: 'Attempted',
     orderIndex: 4,
-    starterCode: {
-      python: `class Solution:
-    def maxSubArray(self, nums):
-        # Write your solution here (Kadane's Algorithm)
-        pass`,
-      javascript: `function maxSubArray(nums) {
-    // Write your solution here (Kadane's Algorithm)
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-using namespace std;
-
-class Solution {
-public:
-    int maxSubArray(vector<int>& nums) {
-        // Write your solution here (Kadane's Algorithm)
-        return 0;
-    }
-};`,
-      java: `class Solution {
-    public int maxSubArray(int[] nums) {
-        // Write your solution here (Kadane's Algorithm)
-        return 0;
-    }
-}`,
-    },
-    testCases: [
-      { input: '9\n-2\n1\n-3\n4\n-1\n2\n1\n-5\n4', expectedOutput: '6' },
-      { input: '1\n1', expectedOutput: '1' },
-      { input: '5\n5\n4\n-1\n7\n8', expectedOutput: '23' },
-    ],
   },
   {
     id: '5',
@@ -304,35 +169,6 @@ public:
     acceptanceRate: 52.3,
     status: 'Not Started',
     orderIndex: 5,
-    starterCode: {
-      python: `class Solution:
-    def longestPalindrome(self, s):
-        # Write your solution here
-        pass`,
-      javascript: `function longestPalindrome(s) {
-    // Write your solution here
-}`,
-      cpp: `#include <string>
-using namespace std;
-
-class Solution {
-public:
-    string longestPalindrome(string s) {
-        // Write your solution here
-        return "";
-    }
-};`,
-      java: `class Solution {
-    public String longestPalindrome(String s) {
-        // Write your solution here
-        return "";
-    }
-}`,
-    },
-    testCases: [
-      { input: 'babad', expectedOutput: 'bab' },
-      { input: 'cbbd', expectedOutput: 'bb' },
-    ],
   },
   {
     id: '6',
@@ -353,35 +189,6 @@ public:
     acceptanceRate: 61.4,
     status: 'Attempted',
     orderIndex: 6,
-    starterCode: {
-      python: `class Solution:
-    def productExceptSelf(self, nums):
-        # Write your solution here (O(n) without division)
-        pass`,
-      javascript: `function productExceptSelf(nums) {
-    // Write your solution here (O(n) without division)
-}`,
-      cpp: `#include <vector>
-using namespace std;
-
-class Solution {
-public:
-    vector<int> productExceptSelf(vector<int>& nums) {
-        // Write your solution here (O(n) without division)
-        return {};
-    }
-};`,
-      java: `class Solution {
-    public int[] productExceptSelf(int[] nums) {
-        // Write your solution here (O(n) without division)
-        return new int[]{};
-    }
-}`,
-    },
-    testCases: [
-      { input: '4\n1\n2\n3\n4', expectedOutput: '24 12 8 6' },
-      { input: '5\n-1\n1\n0\n-3\n3', expectedOutput: '0 0 9 0 0' },
-    ],
   },
   {
     id: '7',
@@ -403,38 +210,6 @@ public:
     acceptanceRate: 36.2,
     status: 'Not Started',
     orderIndex: 7,
-    starterCode: {
-      python: `class Solution:
-    def threeSum(self, nums):
-        # Write your solution here
-        pass`,
-      javascript: `function threeSum(nums) {
-    // Write your solution here
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-using namespace std;
-
-class Solution {
-public:
-    vector<vector<int>> threeSum(vector<int>& nums) {
-        // Write your solution here
-        return {};
-    }
-};`,
-      java: `import java.util.*;
-
-class Solution {
-    public List<List<Integer>> threeSum(int[] nums) {
-        // Write your solution here
-        return new ArrayList<>();
-    }
-}`,
-    },
-    testCases: [
-      { input: '6\n-1\n0\n1\n2\n-1\n-4', expectedOutput: '-1 -1 2' },
-      { input: '3\n0\n0\n0', expectedOutput: '0 0 0' },
-    ],
   },
   {
     id: '8',
@@ -455,36 +230,6 @@ class Solution {
     acceptanceRate: 59.1,
     status: 'Solved',
     orderIndex: 8,
-    starterCode: {
-      python: `class Solution:
-    def maxArea(self, height):
-        # Write your solution here (Two Pointers)
-        pass`,
-      javascript: `function maxArea(height) {
-    // Write your solution here (Two Pointers)
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-using namespace std;
-
-class Solution {
-public:
-    int maxArea(vector<int>& height) {
-        // Write your solution here (Two Pointers approach)
-        return 0;
-    }
-};`,
-      java: `class Solution {
-    public int maxArea(int[] height) {
-        // Write your solution here (Two Pointers approach)
-        return 0;
-    }
-}`,
-    },
-    testCases: [
-      { input: '9\n1\n8\n6\n2\n5\n4\n8\n3\n7', expectedOutput: '49' },
-      { input: '2\n1\n1', expectedOutput: '1' },
-    ],
   },
   {
     id: '9',
@@ -506,60 +251,6 @@ public:
     acceptanceRate: 34.7,
     status: 'Not Started',
     orderIndex: 9,
-    starterCode: {
-      python: `# Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-
-class Solution:
-    def mergeKLists(self, lists):
-        # Write your solution here
-        pass`,
-      javascript: `function mergeKLists(lists) {
-    // Write your solution here
-}`,
-      cpp: `#include <vector>
-using namespace std;
-
-// Definition for singly-linked list.
-// struct ListNode {
-//     int val;
-//     ListNode *next;
-//     ListNode() : val(0), next(nullptr) {}
-//     ListNode(int x) : val(x), next(nullptr) {}
-//     ListNode(int x, ListNode *next) : val(x), next(next) {}
-// };
-
-class Solution {
-public:
-    ListNode* mergeKLists(vector<ListNode*>& lists) {
-        // Write your solution here
-        return nullptr;
-    }
-};`,
-      java: `/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode() {}
- *     ListNode(int val) { this.val = val; }
- *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
- * }
- */
-class Solution {
-    public ListNode mergeKLists(ListNode[] lists) {
-        // Write your solution here
-        return null;
-    }
-}`,
-    },
-    testCases: [
-      { input: '3\n1 4 5\n1 3 4\n2 6', expectedOutput: '1 1 2 3 4 4 5 6' },
-      { input: '0', expectedOutput: '' },
-    ],
   },
   {
     id: '10',
@@ -580,35 +271,6 @@ class Solution {
     acceptanceRate: 28.4,
     status: 'Not Started',
     orderIndex: 10,
-    starterCode: {
-      python: `class Solution:
-    def findMedianSortedArrays(self, nums1, nums2):
-        # Write your solution here (O(log(m+n)))
-        pass`,
-      javascript: `function findMedianSortedArrays(nums1, nums2) {
-    // Write your solution here (O(log(m+n)))
-}`,
-      cpp: `#include <vector>
-using namespace std;
-
-class Solution {
-public:
-    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
-        // Write your solution here (O(log(m+n)))
-        return 0.0;
-    }
-};`,
-      java: `class Solution {
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        // Write your solution here (O(log(m+n)))
-        return 0.0;
-    }
-}`,
-    },
-    testCases: [
-      { input: '2\n1\n3\n1\n2', expectedOutput: '2.00000' },
-      { input: '2\n1\n2\n2\n3\n4', expectedOutput: '2.50000' },
-    ],
   },
   {
     id: '11',
@@ -629,33 +291,6 @@ public:
     acceptanceRate: 91.5,
     status: 'Solved',
     orderIndex: 11,
-    starterCode: {
-      python: `class Solution:
-    def climbStairs(self, n):
-        # Write your solution here (Fibonacci approach)
-        pass`,
-      javascript: `function climbStairs(n) {
-    // Write your solution here (Fibonacci approach)
-}`,
-      cpp: `class Solution {
-public:
-    int climbStairs(int n) {
-        // Write your solution here (Fibonacci approach)
-        return 0;
-    }
-};`,
-      java: `class Solution {
-    public int climbStairs(int n) {
-        // Write your solution here (Fibonacci approach)
-        return 0;
-    }
-}`,
-    },
-    testCases: [
-      { input: '2', expectedOutput: '2' },
-      { input: '3', expectedOutput: '3' },
-      { input: '5', expectedOutput: '8' },
-    ],
   },
   {
     id: '12',
@@ -675,75 +310,6 @@ public:
     acceptanceRate: 31.2,
     status: 'Attempted',
     orderIndex: 12,
-    starterCode: {
-      python: `class LRUCache:
-    def __init__(self, capacity):
-        self.capacity = capacity
-        # Write your solution here
-
-    def get(self, key):
-        # Write your solution here
-        pass
-
-    def put(self, key, value):
-        # Write your solution here
-        pass
-
-# Your LRUCache object will be instantiated and called as:
-# obj = LRUCache(capacity)
-# param_1 = obj.get(key)
-# obj.put(key, value)`,
-      javascript: `var LRUCache = function(capacity) {
-    this.capacity = capacity;
-    // Write your solution here
-};
-
-LRUCache.prototype.get = function(key) {
-    // Write your solution here
-};
-
-LRUCache.prototype.put = function(key, value) {
-    // Write your solution here
-};`,
-      cpp: `#include <unordered_map>
-#include <list>
-using namespace std;
-
-class LRUCache {
-public:
-    LRUCache(int capacity) {
-        // Write your solution here
-    }
-
-    int get(int key) {
-        // Write your solution here
-        return -1;
-    }
-
-    void put(int key, int value) {
-        // Write your solution here
-    }
-};`,
-      java: `import java.util.*;
-
-class LRUCache {
-    public LRUCache(int capacity) {
-        // Write your solution here
-    }
-
-    public int get(int key) {
-        // Write your solution here
-        return -1;
-    }
-
-    public void put(int key, int value) {
-        // Write your solution here
-    }
-}`,
-    },
-    testCases: [
-      { input: '2\nput 1 1\nput 2 2\nget 1\nput 3 3\nget 2', expectedOutput: '1\n-1' },
-    ],
   },
   {
     id: '13',
@@ -765,57 +331,6 @@ class LRUCache {
     acceptanceRate: 88.3,
     status: 'Not Started',
     orderIndex: 13,
-    starterCode: {
-      python: `# Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-
-class Solution:
-    def reverseList(self, head):
-        # Write your solution here (iterative or recursive)
-        pass`,
-      javascript: `function reverseList(head) {
-    // Write your solution here (iterative or recursive)
-}`,
-      cpp: `#include <vector>
-using namespace std;
-
-// Definition for singly-linked list.
-// struct ListNode {
-//     int val;
-//     ListNode *next;
-//     ListNode(int x) : val(x), next(nullptr) {}
-// };
-
-class Solution {
-public:
-    ListNode* reverseList(ListNode* head) {
-        // Write your solution here (iterative or recursive)
-        return nullptr;
-    }
-};`,
-      java: `/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode(int x) { val = x; }
- * }
- */
-class Solution {
-    public ListNode reverseList(ListNode head) {
-        // Write your solution here (iterative or recursive)
-        return null;
-    }
-}`,
-    },
-    testCases: [
-      { input: '5\n1\n2\n3\n4\n5', expectedOutput: '5 4 3 2 1' },
-      { input: '2\n1\n2', expectedOutput: '2 1' },
-      { input: '0', expectedOutput: '' },
-    ],
   },
   {
     id: '14',
@@ -837,36 +352,6 @@ class Solution {
     acceptanceRate: 45.6,
     status: 'Not Started',
     orderIndex: 14,
-    starterCode: {
-      python: `class Solution:
-    def exist(self, board, word):
-        # Write your solution here (Backtracking)
-        pass`,
-      javascript: `function exist(board, word) {
-    // Write your solution here (Backtracking)
-}`,
-      cpp: `#include <vector>
-#include <string>
-using namespace std;
-
-class Solution {
-public:
-    bool exist(vector<vector<char>>& board, string word) {
-        // Write your solution here (Backtracking)
-        return false;
-    }
-};`,
-      java: `class Solution {
-    public boolean exist(char[][] board, String word) {
-        // Write your solution here (Backtracking)
-        return false;
-    }
-}`,
-    },
-    testCases: [
-      { input: '3 4\nA B C E\nS F C S\nA D E E\nABCCED', expectedOutput: 'true' },
-      { input: '3 4\nA B C E\nS F C S\nA D E E\nABCB', expectedOutput: 'false' },
-    ],
   },
 ];
 

@@ -2,24 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/components/ui/avatar';
-import { Menu, X, Globe, LogOut, User, Settings } from 'lucide-react';
+import { Menu, X, Globe, LogOut, LayoutDashboard, User } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { routing, type Locale } from '@/i18n/routing';
-import { useAuth } from '@/hooks/use-auth';
+import { useSession, signOut } from 'next-auth/react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -28,7 +25,7 @@ export default function Navbar() {
   const t = useTranslations('Navbar');
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isLoading, isConfigured, signOut } = useAuth();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,40 +43,137 @@ export default function Navbar() {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push(`/${locale}`);
+    await signOut({ callbackUrl: `/${locale}` });
   };
 
   const navLinks = [
     { label: t('home'), href: `#${locale}` },
-    { label: t('problems'), href: `/${locale}/problems` },
+    { label: t('problems'), href: '#problems' },
     { label: t('features'), href: '#features' },
     { label: t('about'), href: '#how-it-works' },
   ];
 
-  const getUserDisplayName = () => {
-    if (!user) return '';
-    const metaData = user.user_metadata;
-    return metaData?.full_name || metaData?.name || user.email?.split('@')[0] || 'User';
-  };
-
+  // User initials fallback
   const getUserInitials = () => {
-    if (!user) return '';
-    const name = getUserDisplayName();
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    if (session?.user?.name) {
+      return session.user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    return session?.user?.email?.[0]?.toUpperCase() || '?';
   };
 
-  // Auth-aware nav links
-  const authAwareNavLinks = isConfigured && user
-    ? [
-        { label: t('home'), href: `/${locale}` },
-        { label: t('dashboard'), href: `/${locale}/dashboard` },
-        { label: t('profile'), href: `/${locale}/profile` },
-        { label: t('problems'), href: `/${locale}/problems` },
-        { label: t('features'), href: `/${locale}#features` },
-        { label: t('about'), href: `/${locale}#how-it-works` },
-      ]
-    : navLinks;
+  // Auth section for desktop
+  const AuthSection = () => {
+    if (status === 'loading') {
+      return (
+        <div className="w-8 h-8 rounded-full bg-algora-card-bg animate-pulse" />
+      );
+    }
+
+    if (session?.user) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2 rounded-full ring-2 ring-transparent hover:ring-algora-gold/30 transition-all duration-200">
+              <Avatar className="size-8">
+                <AvatarImage src={session.user.image ?? ''} alt={session.user.name ?? ''} />
+                <AvatarFallback className="bg-algora-gold/20 text-algora-gold text-xs font-semibold">
+                  {getUserInitials()}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="w-56 bg-algora-card-bg border-[rgba(255,255,255,0.08)]"
+          >
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium text-algora-text-primary">
+                  {session.user.name || 'User'}
+                </p>
+                <p className="text-xs text-algora-text-muted truncate">
+                  {session.user.email}
+                </p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
+            <DropdownMenuItem
+              onClick={() => router.push(`/${locale}/problems`)}
+              className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer focus:bg-[rgba(255,255,255,0.05)]"
+            >
+              <LayoutDashboard className="w-4 h-4 me-2" />
+              {t('dashboard')}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => router.push(`/${locale}/profile`)}
+              className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer focus:bg-[rgba(255,255,255,0.05)]"
+            >
+              <User className="w-4 h-4 me-2" />
+              {t('profile')}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
+            <DropdownMenuItem
+              onClick={handleSignOut}
+              variant="destructive"
+              className="text-algora-red hover:text-algora-red hover:bg-algora-red/10 cursor-pointer focus:bg-algora-red/10"
+            >
+              <LogOut className="w-4 h-4 me-2" />
+              {t('signOut')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    return (
+      <Button
+        className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold gold-glow rounded-lg"
+        size="sm"
+        asChild
+      >
+        <a href={`/${locale}/auth/signin`}>
+          {t('signIn')}
+        </a>
+      </Button>
+    );
+  };
+
+  // Mobile auth section
+  const MobileAuthSection = () => {
+    if (status === 'loading') {
+      return (
+        <div className="flex items-center gap-3 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+          <div className="w-8 h-8 rounded-full bg-algora-card-bg animate-pulse" />
+          <div className="h-4 w-24 rounded bg-algora-card-bg animate-pulse" />
+        </div>
+      );
+    }
+
+    if (session?.user) {
+      return (
+        <div className="flex items-center gap-3 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+          <Avatar className="size-8">
+            <AvatarImage src={session.user.image ?? ''} alt={session.user.name ?? ''} />
+            <AvatarFallback className="bg-algora-gold/20 text-algora-gold text-xs font-semibold">
+              {getUserInitials()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-algora-text-primary truncate">
+              {session.user.name || 'User'}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <nav
@@ -92,7 +186,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href={`/${locale}`} className="flex items-center gap-2.5 group">
+          <a href={`#${locale}`} className="flex items-center gap-2.5 group">
             <Image
               src="/algora_logo.png"
               alt="Algora"
@@ -107,7 +201,7 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            {authAwareNavLinks.map((link) => (
+            {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
@@ -125,72 +219,7 @@ export default function Navbar() {
               <Globe className="w-4 h-4 me-2" />
               {locale === 'en' ? 'العربية' : 'English'}
             </Button>
-
-            {/* Auth state */}
-            {isConfigured && user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-9 w-9 rounded-full"
-                  >
-                    <Avatar className="h-9 w-9 border border-[rgba(255,255,255,0.1)]">
-                      <AvatarImage src={user.user_metadata?.avatar_url} alt={getUserDisplayName()} />
-                      <AvatarFallback className="bg-algora-gold/20 text-algora-gold text-xs font-semibold">
-                        {getUserInitials()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-56 bg-algora-card-bg border-[rgba(255,255,255,0.1)]"
-                  align="end"
-                  forceMount
-                >
-                  <div className="flex flex-col gap-1 p-2">
-                    <p className="text-sm font-medium text-algora-text-primary leading-none">
-                      {getUserDisplayName()}
-                    </p>
-                    <p className="text-xs text-algora-text-dim leading-none mt-1">
-                      {user.email}
-                    </p>
-                  </div>
-                  <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
-                  <DropdownMenuItem
-                    className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
-                    onClick={() => router.push(`/${locale}/profile`)}
-                  >
-                    <User className="w-4 h-4 me-2" />
-                    {t('profile')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
-                    onClick={() => router.push(`/${locale}/settings`)}
-                  >
-                    <Settings className="w-4 h-4 me-2" />
-                    {t('settings')}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
-                  <DropdownMenuItem
-                    className="text-algora-red hover:text-algora-red hover:bg-[rgba(239,68,68,0.05)] cursor-pointer"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="w-4 h-4 me-2" />
-                    {t('signOut')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button
-                className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold gold-glow rounded-lg"
-                size="sm"
-                asChild
-              >
-                <a href={`/${locale}/auth/signin`}>
-                  {t('signIn')}
-                </a>
-              </Button>
-            )}
+            <AuthSection />
           </div>
 
           {/* Mobile toggle */}
@@ -208,7 +237,7 @@ export default function Navbar() {
       {isMobileOpen && (
         <div className="md:hidden bg-[#161622]/95 backdrop-blur-xl border-b border-[rgba(255,255,255,0.08)] animate-fade-in-up">
           <div className="px-4 py-4 space-y-3">
-            {authAwareNavLinks.map((link) => (
+            {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
@@ -232,40 +261,8 @@ export default function Navbar() {
                 {locale === 'en' ? 'العربية' : 'English'}
               </Button>
             </div>
-
-            {/* Mobile auth state */}
-            {isConfigured && user ? (
-              <div className="pt-2 border-t border-[rgba(255,255,255,0.06)]">
-                <div className="flex items-center gap-3 py-2">
-                  <Avatar className="h-8 w-8 border border-[rgba(255,255,255,0.1)]">
-                    <AvatarImage src={user.user_metadata?.avatar_url} alt={getUserDisplayName()} />
-                    <AvatarFallback className="bg-algora-gold/20 text-algora-gold text-xs font-semibold">
-                      {getUserInitials()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-algora-text-primary truncate">
-                      {getUserDisplayName()}
-                    </p>
-                    <p className="text-xs text-algora-text-dim truncate">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-algora-red hover:text-algora-red hover:bg-[rgba(239,68,68,0.05)] rounded-lg mt-1"
-                  onClick={() => {
-                    handleSignOut();
-                    setIsMobileOpen(false);
-                  }}
-                >
-                  <LogOut className="w-4 h-4 me-2" />
-                  {t('signOut')}
-                </Button>
-              </div>
-            ) : (
+            <MobileAuthSection />
+            {!session?.user && (
               <Button
                 className="w-full bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold rounded-lg"
                 size="sm"
@@ -275,6 +272,46 @@ export default function Navbar() {
                   {t('signIn')}
                 </a>
               </Button>
+            )}
+            {session?.user && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="w-full text-algora-text-muted hover:text-algora-gold hover:bg-[rgba(255,255,255,0.05)] rounded-lg"
+                  size="sm"
+                  onClick={() => {
+                    router.push(`/${locale}/problems`);
+                    setIsMobileOpen(false);
+                  }}
+                >
+                  <LayoutDashboard className="w-4 h-4 me-2" />
+                  {t('dashboard')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full text-algora-text-muted hover:text-algora-gold hover:bg-[rgba(255,255,255,0.05)] rounded-lg"
+                  size="sm"
+                  onClick={() => {
+                    router.push(`/${locale}/profile`);
+                    setIsMobileOpen(false);
+                  }}
+                >
+                  <User className="w-4 h-4 me-2" />
+                  {t('profile')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full text-algora-red hover:text-algora-red hover:bg-algora-red/10 rounded-lg"
+                  size="sm"
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMobileOpen(false);
+                  }}
+                >
+                  <LogOut className="w-4 h-4 me-2" />
+                  {t('signOut')}
+                </Button>
+              </>
             )}
           </div>
         </div>

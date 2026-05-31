@@ -1,19 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
-import { type Locale } from '@/i18n/routing';
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
 interface SampleProblem {
   id: number;
   title: string;
-  titleAr: string;
   description: string;
-  descriptionAr: string;
   difficulty: Difficulty;
   tags: string[];
   acceptance: number;
@@ -38,9 +33,7 @@ const problems: SampleProblem[] = [
   {
     id: 1,
     title: 'Two Sum',
-    titleAr: 'مجموع اثنين',
     description: 'Given an array of integers, return indices of two numbers that add up to a target.',
-    descriptionAr: 'باستخدام مصفوفة من الأعداد الصحيحة، أعد فهري العددين اللذين مجموعهما يساوي القيمة المستهدفة.',
     difficulty: 'Easy',
     tags: ['Array', 'Hash Map'],
     acceptance: 78.5,
@@ -48,9 +41,7 @@ const problems: SampleProblem[] = [
   {
     id: 2,
     title: 'Longest Palindromic Substring',
-    titleAr: 'أطول سلسلة فرعية متطابقة',
     description: 'Find the longest palindromic substring in a given string.',
-    descriptionAr: 'ابحث عن أطول سلسلة فرعية متطابقة في سلسلة معينة.',
     difficulty: 'Medium',
     tags: ['String', 'Dynamic Programming'],
     acceptance: 52.3,
@@ -58,9 +49,7 @@ const problems: SampleProblem[] = [
   {
     id: 3,
     title: 'Merge K Sorted Lists',
-    titleAr: 'دمج قوائم مرتبة',
     description: 'Merge k sorted linked lists into one sorted linked list.',
-    descriptionAr: 'ادمج قوائم مرتبة مرتبة في قائمة مرتبة واحدة.',
     difficulty: 'Hard',
     tags: ['Linked List', 'Heap', 'Divide & Conquer'],
     acceptance: 34.7,
@@ -68,9 +57,7 @@ const problems: SampleProblem[] = [
   {
     id: 4,
     title: 'Binary Search',
-    titleAr: 'البحث الثنائي',
     description: 'Implement binary search on a sorted array to find a target value.',
-    descriptionAr: 'نفذ البحث الثنائي على مصفوفة مرتبة للعثور على قيمة مستهدفة.',
     difficulty: 'Easy',
     tags: ['Array', 'Binary Search'],
     acceptance: 85.2,
@@ -78,9 +65,6 @@ const problems: SampleProblem[] = [
 ];
 
 export default function ProblemsSection() {
-  const t = useTranslations('ProblemsSection');
-  const locale = useLocale() as Locale;
-
   return (
     <section id="problems" className="relative py-24 md:py-32">
       {/* Subtle background texture */}
@@ -90,14 +74,15 @@ export default function ProblemsSection() {
         {/* Section header */}
         <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
           <span className="inline-block text-sm font-medium text-algora-gold tracking-wider uppercase mb-4">
-            {t('badge')}
+            Problems
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            {t('title')}{' '}
-            <span className="gradient-text-gold">{t('titleHighlight')}</span>
+            Practice Real{' '}
+            <span className="gradient-text-gold">Challenges</span>
           </h2>
           <p className="text-algora-text-muted text-lg">
-            {t('description')}
+            Browse through our curated collection of algorithmic problems, each
+            with detailed explanations available in both Arabic and English.
           </p>
         </div>
 
@@ -106,10 +91,9 @@ export default function ProblemsSection() {
           {problems.map((problem, index) => {
             const config = difficultyConfig[problem.difficulty];
             return (
-              <Link
+              <div
                 key={problem.id}
-                href={`/${locale}/problems/${problem.id}`}
-                className="block group bg-algora-card-bg rounded-xl border border-[rgba(255,255,255,0.08)] p-6 card-hover opacity-0 animate-fade-in-up cursor-pointer"
+                className="group bg-algora-card-bg rounded-xl border border-[rgba(255,255,255,0.08)] p-6 card-hover opacity-0 animate-fade-in-up cursor-pointer"
                 style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'forwards' }}
               >
                 <div className="flex items-start justify-between gap-4 mb-4">
@@ -118,7 +102,7 @@ export default function ProblemsSection() {
                       #{problem.id}
                     </span>
                     <h3 className="text-lg font-semibold text-algora-text-primary group-hover:text-algora-gold transition-colors">
-                      {locale === 'ar' ? problem.titleAr : problem.title}
+                      {problem.title}
                     </h3>
                   </div>
                   <Badge
@@ -132,7 +116,7 @@ export default function ProblemsSection() {
                 </div>
 
                 <p className="text-algora-text-muted text-sm mb-4 leading-relaxed">
-                  {locale === 'ar' ? problem.descriptionAr : problem.description}
+                  {problem.description}
                 </p>
 
                 <div className="flex items-center justify-between">
@@ -156,17 +140,17 @@ export default function ProblemsSection() {
                     </span>
                   </div>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
 
         {/* View all link */}
         <div className="text-center mt-12">
-          <Link href={`/${locale}/problems`} className="inline-flex items-center gap-2 text-algora-gold hover:text-algora-gold/80 font-medium transition-colors group">
-            {t('viewAll')}
+          <button className="inline-flex items-center gap-2 text-algora-gold hover:text-algora-gold/80 font-medium transition-colors group">
+            View all 50+ problems
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          </button>
         </div>
       </div>
     </section>
