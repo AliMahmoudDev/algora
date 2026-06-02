@@ -19,10 +19,11 @@ jobs:
     name: Build & Lint
     runs-on: ubuntu-latest
 
-    # ---- Environment Variables (dummy values for CI build) ----
-    # These are needed because Next.js embeds NEXT_PUBLIC_* vars
-    # at build time, and Prisma needs DATABASE_URL for generate.
+    # Force Node.js 24 for GitHub Actions
+    # (Node.js 20 is deprecated and will be removed Sep 2026)
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      # Dummy values for CI build (Next.js embeds NEXT_PUBLIC_* at build time)
       DATABASE_URL: "file:./db/custom.db"
       NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-key"
@@ -52,8 +53,6 @@ jobs:
         run: bun install --frozen-lockfile
 
       # 5) Generate Prisma Client
-      #    This creates the TypeScript types from schema.prisma
-      #    so the build can find the Prisma imports.
       - name: Generate Prisma Client
         run: bunx prisma generate
 
@@ -62,18 +61,5 @@ jobs:
         run: bun run lint
 
       # 7) Build the Next.js project
-      #    This is the main check: if build succeeds,
-      #    the project is structurally sound.
       - name: Build Next.js
         run: bun run build
-
-      # 8) Upload build logs if the build fails
-      #    This helps you see what went wrong directly
-      #    in the GitHub Actions UI without re-running.
-      - name: Upload build logs on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-logs
-          path: .next/build.log
-          retention-days: 7

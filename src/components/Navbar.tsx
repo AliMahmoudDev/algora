@@ -18,6 +18,145 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+function getUserInitials(user: { name?: string | null; email?: string | null }): string {
+  if (user?.name) {
+    return user.name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+  return user?.email?.[0]?.toUpperCase() || '?';
+}
+
+function AuthSection({
+  locale,
+  onSignInLabel,
+  onDashboardLabel,
+  onProfileLabel,
+  onSignOutLabel,
+  onSignOut,
+  onNavigate,
+}: {
+  locale: string;
+  onSignInLabel: string;
+  onDashboardLabel: string;
+  onProfileLabel: string;
+  onSignOutLabel: string;
+  onSignOut: () => void;
+  onNavigate: (path: string) => void;
+}) {
+  const { data: session, status } = useSession();
+
+  if (status === 'loading') {
+    return (
+      <div className="w-8 h-8 rounded-full bg-algora-card-bg animate-pulse" />
+    );
+  }
+
+  if (session?.user) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="flex items-center gap-2 rounded-full ring-2 ring-transparent hover:ring-algora-gold/30 transition-all duration-200">
+            <Avatar className="size-8">
+              <AvatarImage src={session.user.image ?? ''} alt={session.user.name ?? ''} />
+              <AvatarFallback className="bg-algora-gold/20 text-algora-gold text-xs font-semibold">
+                {getUserInitials(session.user)}
+              </AvatarFallback>
+            </Avatar>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          className="w-56 bg-algora-card-bg border-[rgba(255,255,255,0.08)]"
+        >
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium text-algora-text-primary">
+                {session.user.name || 'User'}
+              </p>
+              <p className="text-xs text-algora-text-muted truncate">
+                {session.user.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
+          <DropdownMenuItem
+            onClick={() => onNavigate(`/${locale}/problems`)}
+            className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer focus:bg-[rgba(255,255,255,0.05)]"
+          >
+            <LayoutDashboard className="w-4 h-4 me-2" />
+            {onDashboardLabel}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onNavigate(`/${locale}/profile`)}
+            className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer focus:bg-[rgba(255,255,255,0.05)]"
+          >
+            <User className="w-4 h-4 me-2" />
+            {onProfileLabel}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
+          <DropdownMenuItem
+            onClick={onSignOut}
+            variant="destructive"
+            className="text-algora-red hover:text-algora-red hover:bg-algora-red/10 cursor-pointer focus:bg-algora-red/10"
+          >
+            <LogOut className="w-4 h-4 me-2" />
+            {onSignOutLabel}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  return (
+    <Button
+      className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold gold-glow rounded-lg"
+      size="sm"
+      asChild
+    >
+      <a href={`/${locale}/auth/signin`}>
+        {onSignInLabel}
+      </a>
+    </Button>
+  );
+}
+
+function MobileAuthSection() {
+  const { data: session, status } = useSession();
+
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center gap-3 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+        <div className="w-8 h-8 rounded-full bg-algora-card-bg animate-pulse" />
+        <div className="h-4 w-24 rounded bg-algora-card-bg animate-pulse" />
+      </div>
+    );
+  }
+
+  if (session?.user) {
+    return (
+      <div className="flex items-center gap-3 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+        <Avatar className="size-8">
+          <AvatarImage src={session.user.image ?? ''} alt={session.user.name ?? ''} />
+          <AvatarFallback className="bg-algora-gold/20 text-algora-gold text-xs font-semibold">
+            {getUserInitials(session.user)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-algora-text-primary truncate">
+            {session.user.name || 'User'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -25,7 +164,7 @@ export default function Navbar() {
   const t = useTranslations('Navbar');
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,128 +191,6 @@ export default function Navbar() {
     { label: t('features'), href: '#features' },
     { label: t('about'), href: '#how-it-works' },
   ];
-
-  // User initials fallback
-  const getUserInitials = () => {
-    if (session?.user?.name) {
-      return session.user.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-    }
-    return session?.user?.email?.[0]?.toUpperCase() || '?';
-  };
-
-  // Auth section for desktop
-  const AuthSection = () => {
-    if (status === 'loading') {
-      return (
-        <div className="w-8 h-8 rounded-full bg-algora-card-bg animate-pulse" />
-      );
-    }
-
-    if (session?.user) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-full ring-2 ring-transparent hover:ring-algora-gold/30 transition-all duration-200">
-              <Avatar className="size-8">
-                <AvatarImage src={session.user.image ?? ''} alt={session.user.name ?? ''} />
-                <AvatarFallback className="bg-algora-gold/20 text-algora-gold text-xs font-semibold">
-                  {getUserInitials()}
-                </AvatarFallback>
-              </Avatar>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-56 bg-algora-card-bg border-[rgba(255,255,255,0.08)]"
-          >
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium text-algora-text-primary">
-                  {session.user.name || 'User'}
-                </p>
-                <p className="text-xs text-algora-text-muted truncate">
-                  {session.user.email}
-                </p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
-            <DropdownMenuItem
-              onClick={() => router.push(`/${locale}/problems`)}
-              className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer focus:bg-[rgba(255,255,255,0.05)]"
-            >
-              <LayoutDashboard className="w-4 h-4 me-2" />
-              {t('dashboard')}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => router.push(`/${locale}/profile`)}
-              className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer focus:bg-[rgba(255,255,255,0.05)]"
-            >
-              <User className="w-4 h-4 me-2" />
-              {t('profile')}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
-            <DropdownMenuItem
-              onClick={handleSignOut}
-              variant="destructive"
-              className="text-algora-red hover:text-algora-red hover:bg-algora-red/10 cursor-pointer focus:bg-algora-red/10"
-            >
-              <LogOut className="w-4 h-4 me-2" />
-              {t('signOut')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
-
-    return (
-      <Button
-        className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold gold-glow rounded-lg"
-        size="sm"
-        asChild
-      >
-        <a href={`/${locale}/auth/signin`}>
-          {t('signIn')}
-        </a>
-      </Button>
-    );
-  };
-
-  // Mobile auth section
-  const MobileAuthSection = () => {
-    if (status === 'loading') {
-      return (
-        <div className="flex items-center gap-3 pt-2 border-t border-[rgba(255,255,255,0.06)]">
-          <div className="w-8 h-8 rounded-full bg-algora-card-bg animate-pulse" />
-          <div className="h-4 w-24 rounded bg-algora-card-bg animate-pulse" />
-        </div>
-      );
-    }
-
-    if (session?.user) {
-      return (
-        <div className="flex items-center gap-3 pt-2 border-t border-[rgba(255,255,255,0.06)]">
-          <Avatar className="size-8">
-            <AvatarImage src={session.user.image ?? ''} alt={session.user.name ?? ''} />
-            <AvatarFallback className="bg-algora-gold/20 text-algora-gold text-xs font-semibold">
-              {getUserInitials()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-algora-text-primary truncate">
-              {session.user.name || 'User'}
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    return null;
-  };
 
   return (
     <nav
@@ -219,7 +236,15 @@ export default function Navbar() {
               <Globe className="w-4 h-4 me-2" />
               {locale === 'en' ? 'العربية' : 'English'}
             </Button>
-            <AuthSection />
+            <AuthSection
+              locale={locale}
+              onSignInLabel={t('signIn')}
+              onDashboardLabel={t('dashboard')}
+              onProfileLabel={t('profile')}
+              onSignOutLabel={t('signOut')}
+              onSignOut={handleSignOut}
+              onNavigate={(path) => router.push(path)}
+            />
           </div>
 
           {/* Mobile toggle */}
