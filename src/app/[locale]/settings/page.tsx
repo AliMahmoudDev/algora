@@ -54,7 +54,7 @@ export default function SettingsPage() {
     return session.user.name || session.user.email?.split('@')[0] || 'User';
   };
 
-  const [displayName] = useState(getUserDisplayName);
+  const [displayName, setDisplayName] = useState(getUserDisplayName);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>(
     () => getFromLocalStorage('algora-editor-settings', { fontSize: 14, tabSize: 4, wordWrap: true })
   );
@@ -72,9 +72,9 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = () => {
-    alert(t('deleteAccountConfirm'));
     setShowDeleteConfirm(false);
   };
+  const [deleteProgress, setDeleteProgress] = useState(false);
 
   const sectionCard = 'bg-algora-card-bg rounded-xl border border-[rgba(255,255,255,0.08)] p-6 opacity-0 animate-fade-in-up';
 
@@ -116,7 +116,7 @@ export default function SettingsPage() {
                   <Label className="text-sm text-algora-text-muted">{t('displayName')}</Label>
                   <Input
                     value={displayName}
-                    readOnly
+                    onChange={(e) => setDisplayName(e.target.value)}
                     className="bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)] text-algora-text-primary focus:border-algora-gold focus:ring-algora-gold/20 focus:outline-none rounded-lg h-10"
                     dir={locale === 'ar' ? 'rtl' : 'ltr'}
                   />
@@ -316,8 +316,9 @@ export default function SettingsPage() {
                     <Button
                       className="bg-algora-red hover:bg-algora-red/90 text-white rounded-lg text-sm"
                       onClick={handleDeleteAccount}
+                      disabled={deleteProgress}
                     >
-                      {t('deleteAccount')}
+                      {deleteProgress ? t('saving') || 'Deleting...' : t('deleteAccount')}
                     </Button>
                     <Button
                       variant="ghost"

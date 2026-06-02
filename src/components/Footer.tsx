@@ -9,23 +9,23 @@ const footerSections = [
     titleKey: 'platform',
     links: [
       { labelKey: 'problems', href: '/problems' },
-      { labelKey: 'features', href: '#features' },
-      { labelKey: 'pricing', href: '#' }, // Page doesn't exist yet
+      { labelKey: 'features', href: '/#features' },
+      { labelKey: 'pricing', href: '' },
     ],
   },
   {
     titleKey: 'resources',
     links: [
-      { labelKey: 'documentation', href: '#' }, // Page doesn't exist yet
-      { labelKey: 'blog', href: '#' }, // Page doesn't exist yet
-      { labelKey: 'community', href: '#' }, // Page doesn't exist yet
+      { labelKey: 'documentation', href: '' },
+      { labelKey: 'blog', href: '' },
+      { labelKey: 'community', href: '' },
     ],
   },
   {
     titleKey: 'company',
     links: [
-      { labelKey: 'about', href: '#how-it-works' },
-      { labelKey: 'contact', href: '#' }, // Page doesn't exist yet
+      { labelKey: 'about', href: '/#how-it-works' },
+      { labelKey: 'contact', href: '' },
       { labelKey: 'privacy', href: '/privacy' },
     ],
   },
@@ -70,7 +70,11 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.labelKey}>
-                    {link.href.startsWith('/') ? (
+                    {!link.href ? (
+                      <span className="text-sm text-algora-text-dim/50 cursor-default">
+                        {t(link.labelKey)} <span className="text-[10px] text-algora-text-dim/30 ml-1">(soon)</span>
+                      </span>
+                    ) : link.href.startsWith('/') ? (
                       <Link
                         href={`/${locale}${link.href}`}
                         className="text-sm text-algora-text-dim hover:text-algora-gold transition-colors"

@@ -2,6 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Play } from 'lucide-react';
+import Link from 'next/link';
+import { useLocale } from 'next-intl';
 
 const codeLines = [
   { text: 'function twoSum(nums, target) {', color: 'text-algora-purple' },
@@ -17,6 +19,7 @@ const codeLines = [
 ];
 
 export default function HeroSection() {
+  const locale = useLocale();
   return (
     <section
       id="home"
@@ -68,17 +71,23 @@ export default function HeroSection() {
               <Button
                 size="lg"
                 className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold text-base px-8 gold-glow rounded-lg group"
+                asChild
               >
-                Start Solving
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <Link href={`/${locale}/problems`}>
+                  Start Solving
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="border-[rgba(255,255,255,0.15)] text-algora-text-primary hover:bg-algora-card-bg hover:border-algora-gold/30 font-semibold text-base px-8 rounded-lg group"
+                asChild
               >
-                <Play className="w-4 h-4" />
-                View Problems
+                <Link href={`/${locale}/problems`}>
+                  <Play className="w-4 h-4" />
+                  View Problems
+                </Link>
               </Button>
             </div>
 

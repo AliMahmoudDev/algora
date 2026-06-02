@@ -2,6 +2,8 @@
 
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
@@ -65,6 +67,8 @@ const problems: SampleProblem[] = [
 ];
 
 export default function ProblemsSection() {
+  const router = useRouter();
+  const locale = useLocale();
   return (
     <section id="problems" className="relative py-24 md:py-32">
       {/* Subtle background texture */}
@@ -93,6 +97,10 @@ export default function ProblemsSection() {
             return (
               <div
                 key={problem.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => router.push(`/${locale}/problems/${problem.id}`)}
+                onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/${locale}/problems/${problem.id}`); }}
                 className="group bg-algora-card-bg rounded-xl border border-[rgba(255,255,255,0.08)] p-6 card-hover opacity-0 animate-fade-in-up cursor-pointer"
                 style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'forwards' }}
               >
@@ -147,7 +155,10 @@ export default function ProblemsSection() {
 
         {/* View all link */}
         <div className="text-center mt-12">
-          <button className="inline-flex items-center gap-2 text-algora-gold hover:text-algora-gold/80 font-medium transition-colors group">
+          <button
+            onClick={() => router.push(`/${locale}/problems`)}
+            className="inline-flex items-center gap-2 text-algora-gold hover:text-algora-gold/80 font-medium transition-colors group"
+          >
             View all 50+ problems
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Globe, LogOut, LayoutDashboard, User, Trophy } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { routing, type Locale } from '@/i18n/routing';
@@ -84,7 +85,7 @@ function AuthSection({
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
           <DropdownMenuItem
-            onClick={() => onNavigate(`/${locale}/problems`)}
+            onClick={() => onNavigate(`/${locale}/dashboard`)}
             className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer focus:bg-[rgba(255,255,255,0.05)]"
           >
             <LayoutDashboard className="w-4 h-4 me-2" />
@@ -193,10 +194,10 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { label: t('home'), href: `#${locale}` },
-    { label: t('problems'), href: '#problems' },
-    { label: t('features'), href: '#features' },
-    { label: t('about'), href: '#how-it-works' },
+    { label: t('home'), href: `/${locale}` },
+    { label: t('problems'), href: `/${locale}/problems` },
+    { label: t('features'), href: `/${locale}/#features` },
+    { label: t('about'), href: `/${locale}/#how-it-works` },
   ];
 
   return (
@@ -210,7 +211,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href={`#${locale}`} className="flex items-center gap-2.5 group">
+          <Link href={`/${locale}`} className="flex items-center gap-2.5 group">
             <Image
               src="/algora_logo.png"
               alt="Algora"
@@ -221,18 +222,18 @@ export default function Navbar() {
             <span className="text-xl font-bold tracking-tight text-algora-text-primary">
               Algora
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className="text-sm text-algora-text-muted hover:text-algora-gold transition-colors duration-200"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <Button
               variant="ghost"
@@ -270,14 +271,14 @@ export default function Navbar() {
         <div className="md:hidden bg-[#161622]/95 backdrop-blur-xl border-b border-[rgba(255,255,255,0.08)] animate-fade-in-up">
           <div className="px-4 py-4 space-y-3">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className="block text-sm text-algora-text-muted hover:text-algora-gold transition-colors py-2"
                 onClick={() => setIsMobileOpen(false)}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className="flex items-center gap-3 pt-2 border-t border-[rgba(255,255,255,0.06)]">
               <Button
@@ -300,9 +301,9 @@ export default function Navbar() {
                 size="sm"
                 asChild
               >
-                <a href={`/${locale}/auth/signin`} onClick={() => setIsMobileOpen(false)}>
+                <Link href={`/${locale}/auth/signin`} onClick={() => setIsMobileOpen(false)}>
                   {t('signIn')}
-                </a>
+                </Link>
               </Button>
             )}
             {session?.user && (
@@ -312,7 +313,7 @@ export default function Navbar() {
                   className="w-full text-algora-text-muted hover:text-algora-gold hover:bg-[rgba(255,255,255,0.05)] rounded-lg"
                   size="sm"
                   onClick={() => {
-                    router.push(`/${locale}/problems`);
+                    router.push(`/${locale}/dashboard`);
                     setIsMobileOpen(false);
                   }}
                 >

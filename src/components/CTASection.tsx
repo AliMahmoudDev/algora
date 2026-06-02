@@ -2,8 +2,11 @@
 
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { useLocale } from 'next-intl';
 
 export default function CTASection() {
+  const locale = useLocale();
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background */}
@@ -38,9 +41,12 @@ export default function CTASection() {
           <Button
             size="lg"
             className="bg-algora-gold text-algora-bg-primary hover:bg-algora-gold/90 font-semibold text-base px-8 gold-glow rounded-lg group"
+            asChild
           >
-            Get Started — It&apos;s Free
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <Link href={`/${locale}/auth/signin`}>
+              Get Started — It&apos;s Free
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </Button>
         </div>
 
