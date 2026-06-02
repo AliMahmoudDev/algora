@@ -1,66 +1,190 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
+import { useSession } from 'next-auth/react';
 import Navbar from '@/components/Navbar';
 import {
   Trophy,
   Target,
   TrendingUp,
   Flame,
-  Clock,
   CheckCircle2,
   XCircle,
   ArrowRight,
   Code,
-  ArrowLeftRight,
   type LucideIcon,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { mockProblems, difficultyConfig, type Difficulty } from '@/data/mock-problems';
 import type { Locale } from '@/i18n/routing';
 
-// ── Mock dashboard data ──
-const mockStats = {
-  solved: 4,
-  attempted: 7,
+// Types for API response
+interface DashboardStats {
+  solved: number;
+  attempted: number;
+  total: number;
+  successRate: number;
+  currentStreak: number;
+  submissionsThisWeek: number;
+  recentActivity: RecentActivity[];
+  skillBreakdown: {
+    Easy: { solved: number; total: number };
+    Medium: { solved: number; total: number };
+    Hard: { solved: number; total: number };
+  };
+}
+
+interface RecentActivity {
+  id: string;
+  problemId: string;
+  problemTitle: string;
+  problemTitleAr: string;
+  problemDifficulty: string;
+  status: 'accepted' | 'wrongAnswer' | 'error';
+  language: string;
+  createdAt: string;
+  runtime: number | null;
+  memory: number | null;
+  testCasesPassed: number;
+  testCasesTotal: number;
+}
+
+interface UserProblemStatus {
+  problemId: string;
+  status: string;
+}
+
+const emptyStats: DashboardStats = {
+  solved: 0,
+  attempted: 0,
   total: 14,
-  successRate: 57,
-  currentStreak: 3,
-  submissionsThisWeek: 12,
-  activeDays: 5,
+  successRate: 0,
+  currentStreak: 0,
+  submissionsThisWeek: 0,
+  recentActivity: [],
+  skillBreakdown: {
+    Easy: { solved: 0, total: 5 },
+    Medium: { solved: 0, total: 7 },
+    Hard: { solved: 0, total: 2 },
+  },
 };
 
-const mockRecentActivity = [
-  { id: 1, problemId: '1', problemTitle: 'Two Sum', problemTitleAr: 'مجموع اثنين', status: 'accepted' as const, language: 'Python', time: '2h ago' },
-  { id: 2, problemId: '4', problemTitle: 'Maximum Subarray', problemTitleAr: 'أكبر مصفوفة فرعية', status: 'wrongAnswer' as const, language: 'JavaScript', time: '5h ago' },
-  { id: 3, problemId: '2', problemTitle: 'Valid Palindrome', problemTitleAr: 'السلسلة المتطابقة الصالحة', status: 'accepted' as const, language: 'C++', time: '1d ago' },
-  { id: 4, problemId: '8', problemTitle: 'Container With Most Water', problemTitleAr: 'الحاوية ذات أكبر كمية ماء', status: 'accepted' as const, language: 'Java', time: '2d ago' },
-  { id: 5, problemId: '12', problemTitle: 'LRU Cache', problemTitleAr: 'ذاكرة مؤقتة LRU', status: 'wrongAnswer' as const, language: 'Python', time: '3d ago' },
-];
+function formatTimeAgo(dateStr: string, locale: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHr = Math.floor(diffMs / 3600000);
+  const diffDay = Math.floor(diffMs / 86400000);
 
-const mockSkillBreakdown = {
-  Easy: { solved: 3, total: 5 },
-  Medium: { solved: 1, total: 7 },
-  Hard: { solved: 0, total: 2 },
-};
+  if (locale === 'ar') {
+    if (diffMin < 1) return 'الآن';
+    if (diffMin < 60) return `منذ ${diffMin} دقيقة`;
+    if (diffHr < 24) return `منذ ${diffHr} ساعة`;
+    if (diffDay < 30) return `منذ ${diffDay} يوم`;
+    return `منذ ${Math.floor(diffDay / 30)} شهر`;
+  }
+
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffDay < 30) return `${diffDay}d ago`;
+  return `${Math.floor(diffDay / 30)}mo ago`;
+}
 
 export default function DashboardPage() {
   const t = useTranslations('Dashboard');
   const locale = useLocale() as Locale;
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { data: session, status: authStatus } = useSession();
 
-  const unsolvedProblems = mockProblems.filter(p => p.status !== 'Solved');
+  const [stats, setStats] = useState<DashboardStats>(emptyStats);
+  const [userProblemStatuses, setUserProblemStatuses] = useState<UserProblemStatus[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboardData = useCallback(async (userId: string) => {
+    try {
+      const [statsRes, userProblemsRes] = await Promise.all([
+        fetch(`/api/dashboard/stats?userId=${userId}`),
+        fetch(`/api/submissions?userId=${userId}`),
+      ]);
+
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        setStats(data);
+      }
+
+      if (userProblemsRes.ok) {
+        const submissions = await userProblemsRes.json();
+        // Derive user problem statuses from submissions data
+        // We also need UserProblem data, but we can derive it from the stats
+        // For now, fetch the userProblems from the stats API (already included in skillBreakdown)
+      }
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Also fetch UserProblem statuses for the "Continue Solving" section
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const fetchUserProblems = async () => {
+      try {
+        const res = await fetch(`/api/user-problems?userId=${session.user.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setUserProblemStatuses(data);
+        }
+      } catch {
+        // Fallback: no user problem data
+      }
+    };
+    fetchUserProblems();
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (authStatus === 'loading') return;
+    if (session?.user?.id) {
+      setLoading(true);
+      fetchDashboardData(session.user.id);
+    } else {
+      setLoading(false);
+    }
+  }, [session?.user?.id, authStatus, fetchDashboardData]);
+
   const getProblemTitle = (title: string, titleAr: string) => locale === 'ar' ? titleAr : title;
+
+  // Determine which problems are not solved
+  const solvedProblemIds = new Set(
+    stats.skillBreakdown
+      ? [
+          // We derive solved IDs from userProblemStatuses or use empty set
+        ]
+      : []
+  );
+
+  // Use userProblemStatuses to determine solved problems
+  const solvedIds = new Set(
+    userProblemStatuses.filter(up => up.status === 'Solved').map(up => up.problemId)
+  );
+
+  const unsolvedProblems = mockProblems.filter(p => !solvedIds.has(p.id));
+
+  // Calculate active days from current streak
+  const activeDays = stats.currentStreak;
 
   const statCards = [
     {
       label: t('problemsSolved'),
-      value: mockStats.solved,
-      subtitle: `${t('of')} ${mockStats.total}`,
+      value: stats.solved,
+      subtitle: `${t('of')} ${stats.total}`,
       icon: Trophy,
       color: 'text-algora-gold',
       iconBg: 'bg-algora-gold/10',
@@ -68,8 +192,8 @@ export default function DashboardPage() {
     },
     {
       label: t('problemsAttempted'),
-      value: mockStats.attempted,
-      subtitle: `${mockStats.submissionsThisWeek} ${t('submissionsThisWeek')}`,
+      value: stats.attempted,
+      subtitle: `${stats.submissionsThisWeek} ${t('submissionsThisWeek')}`,
       icon: Target,
       color: 'text-algora-purple',
       iconBg: 'bg-algora-purple/10',
@@ -77,8 +201,8 @@ export default function DashboardPage() {
     },
     {
       label: t('successRate'),
-      value: `${mockStats.successRate}%`,
-      subtitle: `${t('of')} ${mockStats.attempted} ${t('attempted').toLowerCase()}`,
+      value: `${stats.successRate}%`,
+      subtitle: `${t('of')} ${stats.attempted} ${t('attempted').toLowerCase()}`,
       icon: TrendingUp,
       color: 'text-algora-green',
       iconBg: 'bg-algora-green/10',
@@ -86,8 +210,8 @@ export default function DashboardPage() {
     },
     {
       label: t('currentStreak'),
-      value: mockStats.currentStreak,
-      subtitle: `${mockStats.activeDays} ${t('activeDays')}`,
+      value: stats.currentStreak,
+      subtitle: `${activeDays} ${t('activeDays')}`,
       icon: Flame,
       color: 'text-algora-red',
       iconBg: 'bg-algora-red/10',
@@ -114,9 +238,9 @@ export default function DashboardPage() {
             </h1>
             <p className="text-algora-text-muted text-sm md:text-base">
               {t('welcomeBack')}
-              {user?.user_metadata?.full_name
-                ? `, ${user.user_metadata.full_name}`
-                : user?.email ? `, ${user.email.split('@')[0]}` : ''
+              {session?.user?.name
+                ? `, ${session.user.name}`
+                : session?.user?.email ? `, ${session.user.email.split('@')[0]}` : ''
               }! {t('overview')}
             </p>
           </div>
@@ -129,20 +253,31 @@ export default function DashboardPage() {
                 className="bg-algora-card-bg rounded-xl border border-[rgba(255,255,255,0.08)] p-4 md:p-6 card-hover opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.1}s`, animationFillMode: 'forwards' }}
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-lg ${card.iconBg} border ${card.borderColor} flex items-center justify-center`}>
-                    <card.icon className={`w-5 h-5 ${card.color}`} />
+                {loading ? (
+                  <div className="space-y-3">
+                    <Skeleton className="h-10 w-10 rounded-lg" />
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-20" />
                   </div>
-                </div>
-                <div className={`text-2xl md:text-3xl font-bold ${card.color} mb-1`}>
-                  {card.value}
-                </div>
-                <div className="text-algora-text-primary text-sm font-medium">
-                  {card.label}
-                </div>
-                <div className="text-algora-text-dim text-xs mt-0.5">
-                  {card.subtitle}
-                </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-10 h-10 rounded-lg ${card.iconBg} border ${card.borderColor} flex items-center justify-center`}>
+                        <card.icon className={`w-5 h-5 ${card.color}`} />
+                      </div>
+                    </div>
+                    <div className={`text-2xl md:text-3xl font-bold ${card.color} mb-1`}>
+                      {card.value}
+                    </div>
+                    <div className="text-algora-text-primary text-sm font-medium">
+                      {card.label}
+                    </div>
+                    <div className="text-algora-text-dim text-xs mt-0.5">
+                      {card.subtitle}
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -164,50 +299,82 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {mockRecentActivity.map((activity, index) => (
-                    <div
-                      key={activity.id}
-                      className="flex items-center gap-4 p-3 rounded-lg bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.04)] hover:border-[rgba(255,255,255,0.08)] transition-colors cursor-pointer"
-                      onClick={() => router.push(`/${locale}/problems/${activity.problemId}`)}
-                      style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'forwards' }}
-                    >
-                      {/* Status Icon */}
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                        activity.status === 'accepted'
-                          ? 'bg-algora-green/10'
-                          : 'bg-algora-red/10'
-                      }`}>
-                        {activity.status === 'accepted' ? (
-                          <CheckCircle2 className="w-4 h-4 text-algora-green" />
-                        ) : (
-                          <XCircle className="w-4 h-4 text-algora-red" />
-                        )}
-                      </div>
-
-                      {/* Problem Info */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-algora-text-primary truncate">
-                          {getProblemTitle(activity.problemTitle, activity.problemTitleAr)}
-                        </p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-xs text-algora-text-dim">{activity.language}</span>
-                          <span className="text-algora-text-dim/30">·</span>
-                          <span className="text-xs text-algora-text-dim">{activity.time}</span>
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.04)]">
+                        <Skeleton className="h-8 w-8 rounded-lg" />
+                        <div className="flex-1 space-y-1.5">
+                          <Skeleton className="h-4 w-40" />
+                          <Skeleton className="h-3 w-24" />
                         </div>
+                        <Skeleton className="h-6 w-20 rounded-md" />
                       </div>
-
-                      {/* Status Badge */}
-                      <Badge
-                        className={`text-xs font-medium border ${
-                          activity.status === 'accepted'
-                            ? 'bg-algora-green/15 text-algora-green border-algora-green/30'
-                            : 'bg-algora-red/15 text-algora-red border-algora-red/30'
-                        }`}
+                    ))
+                  ) : stats.recentActivity.length > 0 ? (
+                    stats.recentActivity.map((activity, index) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center gap-4 p-3 rounded-lg bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.04)] hover:border-[rgba(255,255,255,0.08)] transition-colors cursor-pointer"
+                        onClick={() => router.push(`/${locale}/problems/${activity.problemId}`)}
+                        style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'forwards' }}
                       >
-                        {activity.status === 'accepted' ? t('accepted') : t('wrongAnswer')}
-                      </Badge>
+                        {/* Status Icon */}
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          activity.status === 'accepted'
+                            ? 'bg-algora-green/10'
+                            : 'bg-algora-red/10'
+                        }`}>
+                          {activity.status === 'accepted' ? (
+                            <CheckCircle2 className="w-4 h-4 text-algora-green" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-algora-red" />
+                          )}
+                        </div>
+
+                        {/* Problem Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-algora-text-primary truncate">
+                            {getProblemTitle(activity.problemTitle, activity.problemTitleAr)}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-xs text-algora-text-dim">{activity.language}</span>
+                            <span className="text-algora-text-dim/30">·</span>
+                            <span className="text-xs text-algora-text-dim">
+                              {formatTimeAgo(activity.createdAt, locale)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Status Badge */}
+                        <Badge
+                          className={`text-xs font-medium border ${
+                            activity.status === 'accepted'
+                              ? 'bg-algora-green/15 text-algora-green border-algora-green/30'
+                              : 'bg-algora-red/15 text-algora-red border-algora-red/30'
+                          }`}
+                        >
+                          {activity.status === 'accepted' ? t('accepted') : t('wrongAnswer')}
+                        </Badge>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-12">
+                      <Code className="w-12 h-12 text-algora-text-dim/30 mx-auto mb-3" />
+                      <p className="text-sm text-algora-text-dim">
+                        {locale === 'ar'
+                          ? 'لا يوجد نشاط بعد. ابدأ بحل مسألة!'
+                          : 'No activity yet. Start solving a problem!'}
+                      </p>
+                      <Button
+                        variant="outline"
+                        className="mt-4 border-algora-gold/30 text-algora-gold hover:bg-algora-gold/10 rounded-lg"
+                        onClick={() => router.push(`/${locale}/problems`)}
+                      >
+                        <Code className="w-4 h-4 me-2" />
+                        {locale === 'ar' ? 'تصفح المسائل' : 'Browse Problems'}
+                      </Button>
                     </div>
-                  ))}
+                  )}
                 </div>
               </section>
 
@@ -223,37 +390,46 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="space-y-6">
-                  {(Object.entries(mockSkillBreakdown) as [Difficulty, { solved: number; total: number }][]).map(([difficulty, data]) => {
-                    const pct = data.total > 0 ? Math.round((data.solved / data.total) * 100) : 0;
-                    const colors = skillColors[difficulty];
-                    return (
-                      <div key={difficulty}>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${colors.text}`}>
-                              {t(difficulty.toLowerCase() as 'easy' | 'medium' | 'hard')}
-                            </span>
-                            <Badge className={`${difficultyConfig[difficulty].color} text-xs border`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${difficultyConfig[difficulty].dot} mr-1.5`} />
-                              {difficulty}
-                            </Badge>
-                          </div>
-                          <span className="text-sm text-algora-text-muted">
-                            {data.solved}/{data.total} {t('solved').toLowerCase()}
-                          </span>
-                        </div>
-                        <div className="w-full h-2.5 rounded-full bg-[rgba(255,255,255,0.05)] overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${colors.bar} transition-all duration-700`}
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                        <div className="text-xs text-algora-text-dim mt-1 text-end">
-                          {pct}%
-                        </div>
+                  {loading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="space-y-2">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-2.5 w-full rounded-full" />
                       </div>
-                    );
-                  })}
+                    ))
+                  ) : (
+                    (Object.entries(stats.skillBreakdown) as [Difficulty, { solved: number; total: number }][]).map(([difficulty, data]) => {
+                      const pct = data.total > 0 ? Math.round((data.solved / data.total) * 100) : 0;
+                      const colors = skillColors[difficulty];
+                      return (
+                        <div key={difficulty}>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-sm font-medium ${colors.text}`}>
+                                {t(difficulty.toLowerCase() as 'easy' | 'medium' | 'hard')}
+                              </span>
+                              <Badge className={`${difficultyConfig[difficulty].color} text-xs border`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${difficultyConfig[difficulty].dot} mr-1.5`} />
+                                {difficulty}
+                              </Badge>
+                            </div>
+                            <span className="text-sm text-algora-text-muted">
+                              {data.solved}/{data.total} {t('solved').toLowerCase()}
+                            </span>
+                          </div>
+                          <div className="w-full h-2.5 rounded-full bg-[rgba(255,255,255,0.05)] overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${colors.bar} transition-all duration-700`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <div className="text-xs text-algora-text-dim mt-1 text-end">
+                            {pct}%
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </section>
             </div>
@@ -271,7 +447,17 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="space-y-3 max-h-[480px] overflow-y-auto custom-scrollbar">
-                  {unsolvedProblems.length > 0 ? (
+                  {loading ? (
+                    Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.04)]">
+                        <Skeleton className="h-4 w-6" />
+                        <div className="flex-1 space-y-1.5">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-4 w-12 rounded-md" />
+                        </div>
+                      </div>
+                    ))
+                  ) : unsolvedProblems.length > 0 ? (
                     unsolvedProblems.map((problem) => {
                       const config = difficultyConfig[problem.difficulty];
                       return (

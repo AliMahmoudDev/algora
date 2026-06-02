@@ -25,8 +25,7 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       # Dummy values for CI build (Next.js embeds NEXT_PUBLIC_* at build time)
       DATABASE_URL: "file:./db/custom.db"
-      NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-key"
+      AUTH_SECRET: "dev-secret-for-ci"
 
     steps:
       # 1) Checkout the repository code

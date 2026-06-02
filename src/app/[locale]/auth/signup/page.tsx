@@ -52,38 +52,24 @@ export default function SignUpPage() {
     setIsLoading(true);
     setErrors({});
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      setErrors({ general: 'Authentication service is not configured.' });
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      // Create user via Supabase REST API
-      const res = await fetch(`${supabaseUrl}/auth/v1/signup`, {
+      // Create user via our own signup API
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
-          apikey: supabaseKey,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          name: name.trim(),
           email,
           password,
-          data: {
-            full_name: name.trim(),
-          },
         }),
       });
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        const errorMsg =
-          errorData?.msg || errorData?.error_msg || errorData?.message || "Sign up failed. Please try again.";
-        // Check for common error messages
-        if (errorMsg.includes("already registered") || errorMsg.includes("already been registered")) {
+        const errorMsg = errorData?.error || "Sign up failed. Please try again.";
+        if (res.status === 409) {
           setErrors({ email: "An account with this email already exists." });
         } else {
           setErrors({ general: errorMsg });

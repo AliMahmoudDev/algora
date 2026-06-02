@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { executeCode, SUPPORTED_LANGUAGES } from '@/lib/piston';
+import { executeCode, SUPPORTED_LANGUAGES } from '@/lib/judge0';
 
 export async function POST(request: NextRequest) {
   try {

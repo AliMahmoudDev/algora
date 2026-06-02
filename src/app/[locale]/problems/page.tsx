@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
@@ -22,8 +22,27 @@ import {
   ChevronRight,
   X,
   SlidersHorizontal,
+  Loader2,
 } from 'lucide-react';
-import { mockProblems, difficultyOrder, difficultyConfig, categoryList, type Difficulty, type ProblemStatus } from '@/data/mock-problems';
+import { difficultyOrder, difficultyConfig, categoryList, type Difficulty, type ProblemStatus, mockProblems } from '@/data/mock-problems';
+
+export type ProblemListItem = {
+  id: string;
+  title: string;
+  titleAr: string;
+  slug: string;
+  description: string;
+  descriptionAr: string;
+  difficulty: Difficulty;
+  category: string;
+  tags: string[];
+  examples: { input: string; output: string; explanation?: string; explanationAr?: string }[];
+  constraints: string;
+  constraintsAr: string;
+  acceptanceRate: number;
+  status: ProblemStatus;
+  orderIndex: number;
+};
 
 const ITEMS_PER_PAGE = 6;
 
@@ -45,9 +64,31 @@ export default function ProblemsPage() {
   const [sortBy, setSortBy] = useState<SortOption>('order');
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  const [problems, setProblems] = useState<ProblemListItem[]>(mockProblems);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch problems from DB on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchProblems() {
+      try {
+        const res = await fetch('/api/problems');
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled) setProblems(data);
+        }
+      } catch {
+        // Silently fall back to mock data
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+    fetchProblems();
+    return () => { cancelled = true; };
+  }, []);
 
   const filteredProblems = useMemo(() => {
-    let result = [...mockProblems];
+    let result = [...problems];
 
     // Search filter
     if (search.trim()) {
@@ -94,7 +135,7 @@ export default function ProblemsPage() {
     });
 
     return result;
-  }, [search, difficultyFilter, categoryFilter, statusFilter, sortBy, locale]);
+  }, [search, difficultyFilter, categoryFilter, statusFilter, sortBy, locale, problems]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProblems.length / ITEMS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
@@ -118,9 +159,14 @@ export default function ProblemsPage() {
       {/* Header */}
       <div className="border-b border-[rgba(255,255,255,0.08)] bg-[#0D0D12]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-algora-text-primary mb-2">
-            {t('title')}
-          </h1>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-algora-text-primary">
+              {t('title')}
+            </h1>
+            {isLoading && (
+              <Loader2 className="w-5 h-5 animate-spin text-algora-text-dim" />
+            )}
+          </div>
           <p className="text-algora-text-muted text-sm md:text-base">
             {t('subtitle')}
           </p>

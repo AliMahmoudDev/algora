@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
@@ -20,8 +20,12 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
+  Clock,
+  Code2,
 } from 'lucide-react';
-import { getProblemById, difficultyConfig } from '@/data/mock-problems';
+import { getProblemById, difficultyConfig, type Problem } from '@/data/mock-problems';
+import CodeEditor from '@/components/CodeEditor';
+import { useSession } from 'next-auth/react';
 
 const starterCode: Record<string, Record<string, string>> = {
   'two-sum': {
@@ -69,8 +73,76 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<'success' | 'fail' | null>(null);
   const [activeTab, setActiveTab] = useState<'description' | 'submissions'>('description');
+  const [submissions, setSubmissions] = useState<Array<{
+    id: string;
+    code: string;
+    language: string;
+    status: string;
+    runtime: number | null;
+    memory: number | null;
+    testCasesPassed: number;
+    testCasesTotal: number;
+    createdAt: string;
+  }>>([]);
+  const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(false);
 
-  const problem = getProblemById(id);
+  const { data: session } = useSession();
+
+  // State for DB-backed problem with mock-data fallback
+  const [dbProblem, setDbProblem] = useState<Problem | null>(null);
+  const [isLoadingProblem, setIsLoadingProblem] = useState(true);
+
+  // Fetch problem from DB on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchProblem() {
+      try {
+        const res = await fetch(`/api/problems?id=${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled && data && !data.error) setDbProblem(data);
+        }
+      } catch {
+        // Silently fall back to mock data
+      } finally {
+        if (!cancelled) setIsLoadingProblem(false);
+      }
+    }
+    fetchProblem();
+    return () => { cancelled = true; };
+  }, [id]);
+
+  const problem = dbProblem || getProblemById(id);
+
+  const fetchSubmissions = useCallback(async () => {
+    if (!session?.user?.id) return;
+    setIsLoadingSubmissions(true);
+    try {
+      const response = await fetch(`/api/submissions?userId=${session.user.id}&problemId=${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSubmissions(data);
+      }
+    } catch {
+      // Silently fail
+    } finally {
+      setIsLoadingSubmissions(false);
+    }
+  }, [session?.user?.id, id]);
+
+  useEffect(() => {
+    if (activeTab === 'submissions') {
+      fetchSubmissions();
+    }
+  }, [activeTab, fetchSubmissions]);
+
+  if (isLoadingProblem) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0D0D12]">
+        <Loader2 className="w-6 h-6 animate-spin text-algora-text-dim" />
+      </div>
+    );
+  }
 
   if (!problem) {
     return (
@@ -100,19 +172,100 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
     setIsRunning(true);
     setOutput('');
     setSubmitResult(null);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setOutput(`Running...\n\nTest Case 1: ${problem.examples[0]?.input || 'N/A'}\nOutput: ${problem.examples[0]?.output || 'N/A'}\n✓ Passed (0ms)\n\nTest Case 2: ${problem.examples[1]?.input || 'N/A'}\nOutput: ${problem.examples[1]?.output || 'N/A'}\n✓ Passed (1ms)\n\nExecution Time: 52ms\nMemory: 42.1 MB`);
-    setIsRunning(false);
+
+    try {
+      // Test against first example
+      const example = problem.examples[0];
+      if (!example) {
+        setOutput('No test cases available');
+        setIsRunning(false);
+        return;
+      }
+
+      const response = await fetch('/api/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: getCode(),
+          language,
+          stdin: example.input,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        setOutput(`Error: ${result.error}`);
+      } else {
+        const actual = (result.stdout || '').trim();
+        const expected = example.output.trim();
+        const passed = actual === expected;
+
+        setOutput(
+          `Test Case 1:\nInput: ${example.input}\nExpected: ${expected}\nOutput: ${actual}\n${passed ? '✓ Passed' : '✗ Failed'}${result.time ? ` (${result.time}s)` : ''}\n` +
+          (result.stderr ? `\nStderr: ${result.stderr}\n` : '') +
+          (result.time ? `Execution Time: ${(parseFloat(result.time) * 1000).toFixed(0)}ms\n` : '') +
+          (result.memory ? `Memory: ${(result.memory / 1024).toFixed(1)} MB` : '')
+        );
+      }
+    } catch (error) {
+      setOutput(`Error: ${error instanceof Error ? error.message : 'Failed to execute code'}`);
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setOutput('');
     setSubmitResult(null);
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    setOutput(`\n✓ All Test Cases Passed!\n\nTest Cases: 52/52\nRuntime: 72ms (faster than 87.3%)\nMemory: 42.1 MB (less than 91.2%)`);
-    setSubmitResult('success');
-    setIsSubmitting(false);
+
+    try {
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: getCode(),
+          language,
+          problemId: problem.id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        setOutput(`Error: ${result.error}`);
+        setSubmitResult('fail');
+      } else {
+        const { status, testCasesPassed, testCasesTotal, results } = result;
+        const isAccepted = status === 'Accepted';
+
+        let outputStr = isAccepted
+          ? '✓ All Test Cases Passed!\n\n'
+          : `✗ ${status}\n\n`;
+
+        outputStr += `Test Cases: ${testCasesPassed}/${testCasesTotal}\n\n`;
+
+        results.forEach((tc: { input: string; expected: string; actual: string; passed: boolean }, idx: number) => {
+          outputStr += `Test Case ${idx + 1}:\n`;
+          outputStr += `  Input: ${tc.input}\n`;
+          outputStr += `  Expected: ${tc.expected}\n`;
+          outputStr += `  Output: ${tc.actual}\n`;
+          outputStr += `  ${tc.passed ? '✓ Passed' : '✗ Failed'}\n\n`;
+        });
+
+        if (result.runtime) outputStr += `Runtime: ${(result.runtime * 1000).toFixed(0)}ms\n`;
+        if (result.memory) outputStr += `Memory: ${(result.memory / 1024).toFixed(1)} MB\n`;
+
+        setOutput(outputStr);
+        setSubmitResult(isAccepted ? 'success' : 'fail');
+      }
+    } catch (error) {
+      setOutput(`Error: ${error instanceof Error ? error.message : 'Submission failed'}`);
+      setSubmitResult('fail');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -167,11 +320,12 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                 value="submissions"
                 className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-algora-gold data-[state=active]:bg-transparent data-[state=active]:shadow-none text-algora-text-muted data-[state=active]:text-algora-gold h-full px-4 text-sm"
               >
-                Submissions (3)
+                {t('submissions')} ({submissions.length})
               </TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-6">
+              {activeTab === 'description' ? (
               <div className="space-y-4">
                 {/* Problem Statement */}
                 <div className="text-sm text-algora-text-muted leading-relaxed whitespace-pre-line">
@@ -252,6 +406,70 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                   </div>
                 </div>
               </div>
+              ) : (
+              <div className="space-y-4">
+                {/* Submissions List */}
+                {isLoadingSubmissions ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-5 h-5 animate-spin text-algora-text-dim" />
+                  </div>
+                ) : submissions.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <Code2 className="w-10 h-10 text-algora-text-dim mb-3" />
+                    <p className="text-sm text-algora-text-muted">
+                      {locale === 'ar' ? 'لا توجد حلول مُقدمة لهذه المسألة بعد' : 'No submissions for this problem yet'}
+                    </p>
+                    <p className="text-xs text-algora-text-dim mt-1">
+                      {locale === 'ar' ? 'قدّم حلك الأول!' : 'Submit your first solution!'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {submissions.map((sub) => (
+                      <div
+                        key={sub.id}
+                        className="rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-4 hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge
+                            className={`text-xs font-medium border ${
+                              sub.status === 'Accepted'
+                                ? 'bg-algora-green/15 text-algora-green border-algora-green/30'
+                                : sub.status === 'Wrong Answer'
+                                ? 'bg-algora-red/15 text-algora-red border-algora-red/30'
+                                : 'bg-algora-gold/15 text-algora-gold border-algora-gold/30'
+                            }`}
+                          >
+                            {sub.status === 'Accepted' ? '✓' : '✗'} {sub.status}
+                          </Badge>
+                          <div className="flex items-center gap-1 text-xs text-algora-text-dim">
+                            <Clock className="w-3 h-3" />
+                            {new Date(sub.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-algora-text-muted">
+                          <span className="capitalize">
+                            {sub.language === 'python' ? 'Python' : sub.language === 'javascript' ? 'JavaScript' : sub.language === 'cpp' ? 'C++' : 'Java'}
+                          </span>
+                          <span>
+                            {sub.testCasesPassed}/{sub.testCasesTotal} {locale === 'ar' ? 'حالات اختبار' : 'test cases'}
+                          </span>
+                          {sub.runtime !== null && (
+                            <span>{(sub.runtime * 1000).toFixed(0)}ms</span>
+                          )}
+                          <span>{sub.code.length} {locale === 'ar' ? 'حرف' : 'chars'}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              )}
             </div>
           </Tabs>
         </div>
@@ -316,15 +534,15 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
                 </div>
               </div>
 
-              {/* Textarea as code editor placeholder */}
-              <textarea
-                value={getCode()}
-                onChange={(e) => setCode(e.target.value)}
-                className="flex-1 min-h-[200px] md:min-h-0 bg-[#161622] text-algora-text-primary font-mono text-sm p-4 resize-none focus:outline-none leading-6 selection:bg-algora-gold/20"
-                spellCheck={false}
-                autoCapitalize="off"
-                autoCorrect="off"
-              />
+              {/* Monaco Code Editor */}
+              <div className="flex-1 min-h-0">
+                <CodeEditor
+                  value={getCode()}
+                  onChange={(val) => setCode(val)}
+                  language={language}
+                  height="100%"
+                />
+              </div>
             </div>
           </div>
 

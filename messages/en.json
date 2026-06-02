@@ -103,7 +103,8 @@
     "privacy": "Privacy",
     "description": "A bilingual algorithms education platform with AI-powered learning assistance.",
     "copyright": "© 2026 Algora. All rights reserved.",
-    "builtWith": "Built with"
+    "builtWith": "Built with",
+    "builtForCommunity": "for the algorithmic community"
   },
   "Auth": {
     "signIn": {
@@ -181,6 +182,21 @@
     "categoryLabel": "Category",
     "acceptanceLabel": "Acceptance"
   },
+  "Leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "user": "User",
+    "problemsSolved": "Solved",
+    "points": "Points",
+    "successRate": "Success Rate",
+    "totalSubmissions": "Submissions",
+    "bestRuntime": "Best Time",
+    "you": "You",
+    "noData": "No submissions yet. Solve some problems to appear on the leaderboard!",
+    "topPerformers": "Top Performers",
+    "yourRank": "Your Rank",
+    "loading": "Loading leaderboard..."
+  },
   "ProblemView": {
     "description": "Description",
     "editor": "Editor",
@@ -198,6 +214,15 @@
     "submitSuccess": "All test cases passed! ✓",
     "submitFail": "Some test cases failed. Try again.",
     "runtime": "Runtime",
-    "memory": "Memory"
+    "memory": "Memory",
+    "submissions": "Submissions"
+  },
+  "Privacy": {
+    "title": "Privacy Policy — Algora",
+    "description": "Learn about how Algora collects, uses, and protects your personal information."
+  },
+  "Terms": {
+    "title": "Terms of Service — Algora",
+    "description": "Read the terms and conditions for using the Algora platform."
   }
 }

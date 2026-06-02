@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Navbar from '@/components/Navbar';
-import { useAuth } from '@/hooks/use-auth';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -47,12 +47,11 @@ function getFromLocalStorage<T>(key: string, fallback: T): T {
 export default function SettingsPage() {
   const t = useTranslations('Settings');
   const locale = useLocale() as Locale;
-  const { user } = useAuth();
+  const { data: session } = useSession();
 
   const getUserDisplayName = () => {
-    if (!user) return 'Algora User';
-    const metaData = user.user_metadata;
-    return metaData?.full_name || metaData?.name || user.email?.split('@')[0] || 'User';
+    if (!session?.user) return 'Algora User';
+    return session.user.name || session.user.email?.split('@')[0] || 'User';
   };
 
   const [displayName] = useState(getUserDisplayName);
@@ -127,7 +126,7 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label className="text-sm text-algora-text-muted">{t('email')}</Label>
                   <Input
-                    value={user?.email || 'user@algora.dev'}
+                    value={session?.user?.email || 'user@algora.dev'}
                     readOnly
                     className="bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.06)] text-algora-text-dim rounded-lg h-10 cursor-not-allowed"
                     dir={locale === 'ar' ? 'rtl' : 'ltr'}

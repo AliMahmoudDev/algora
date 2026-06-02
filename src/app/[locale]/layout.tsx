@@ -26,39 +26,59 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const t = await getTranslations({ locale, namespace: 'Navbar' });
 
   const title = locale === 'ar'
-    ? "ألغورا — أتقن الخوارزميات. اصنع المستقبل."
-    : "Algora — Master Algorithms. Code the Future.";
+    ? 'ألغورا — أتقن الخوارزميات وهياكل البيانات'
+    : 'Algora — Master Algorithms & Data Structures';
 
   const description = locale === 'ar'
-    ? "منصة تعليمية ثنائية اللغة للخوارزميات وحل المشكلات مع تعلم مدعوم بالذكاء الاصطناعي."
-    : "A bilingual (Arabic + English) algorithms & problem-solving education platform with AI-powered learning.";
+    ? 'تدرّب على الخوارزميات مع تنفيذ الأكواد في الوقت الحقيقي بلغة بايثون وجافاسكريبت وسي بلس بلس وجافا. منصة ثنائية اللغة بالعربية والإنجليزية.'
+    : 'Practice algorithms with real-time code execution in Python, JavaScript, C++, and Java. Bilingual platform in Arabic and English.';
 
   return {
     title,
     description,
     keywords: [
-      "Algora",
-      "algorithms",
-      "competitive programming",
-      "problem solving",
-      "bilingual",
-      "Arabic",
-      "English",
-      "AI",
-      "code editor",
+      'Algora',
+      'algorithms',
+      'data structures',
+      'competitive programming',
+      'problem solving',
+      'bilingual',
+      'Arabic',
+      'English',
+      'AI',
+      'code editor',
+      'Python',
+      'JavaScript',
+      'C++',
+      'Java',
+      'LeetCode alternative',
     ],
-    authors: [{ name: "Algora Team" }],
+    authors: [{ name: 'Algora Team', url: 'https://github.com/AliMahmoudDev/algora' }],
     icons: {
-      icon: "/icon.png",
-      apple: "/apple-icon.png",
+      icon: [
+        { url: '/icon.png', sizes: '32x32', type: 'image/png' },
+        { url: '/icon.svg', type: 'image/svg+xml' },
+      ],
+      apple: '/apple-icon.png',
+    },
+    metadataBase: new URL('https://algora.dev'),
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        en: '/en',
+        ar: '/ar',
+      },
     },
     openGraph: {
       title,
       description,
-      type: "website",
+      type: 'website',
+      url: `https://algora.dev/${locale}`,
+      siteName: 'Algora',
+      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
       images: [
         {
-          url: "/og-image.png",
+          url: '/og-image.png',
           width: 1200,
           height: 630,
           alt: title,
@@ -66,10 +86,22 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description,
-      images: ["/og-image.png"],
+      images: ['/og-image.png'],
+      creator: '@algora_dev',
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }

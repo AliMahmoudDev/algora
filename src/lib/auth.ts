@@ -2,9 +2,8 @@ import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+import bcrypt from "bcryptjs";
+import { db } from "@/lib/db";
 
 const providers = [
   GitHub({
@@ -22,47 +21,24 @@ const providers = [
       password: { label: "Password", type: "password" },
     },
     async authorize(credentials) {
-      const sbUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const sbKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-      if (!sbUrl || !sbKey) {
-        console.error("Missing Supabase environment variables");
-        return null;
-      }
-
       const email = credentials.email as string;
       const password = credentials.password as string;
 
       if (!email || !password) return null;
 
       try {
-        const res = await fetch(
-          `${sbUrl}/auth/v1/token?grant_type=password`,
-          {
-            method: "POST",
-            headers: {
-              apikey: sbKey,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-          }
-        );
+        const user = await db.user.findUnique({ where: { email } });
 
-        if (!res.ok) {
-          return null;
-        }
+        if (!user || !user.password) return null;
 
-        const data = await res.json();
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) return null;
 
         return {
-          id: data.user.id,
-          email: data.user.email ?? "",
-          name:
-            data.user.user_metadata?.full_name ??
-            data.user.email?.split("@")[0] ??
-            null,
-          image: data.user.user_metadata?.avatar_url ?? null,
-          accessToken: data.access_token,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
         };
       } catch (error) {
         console.error("Credentials authorization error:", error);
@@ -81,6 +57,7 @@ const config: Parameters<typeof NextAuth>[0] = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
+        token.createdAt = (user as { createdAt?: string }).createdAt;
       }
       if (account) {
         token.accessToken = account.access_token;
@@ -98,17 +75,7 @@ const config: Parameters<typeof NextAuth>[0] = {
     signIn: "/en/auth/signin",
     error: "/en/auth/signin",
   },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || "dev-secret-change-in-production",
 };
-
-// Only configure the Supabase adapter when env vars are available
-// (they may be absent at build time, which is fine)
-if (supabaseUrl && supabaseServiceKey) {
-  const { SupabaseAdapter } = await import("@auth/supabase-adapter");
-  config.adapter = SupabaseAdapter({
-    url: supabaseUrl,
-    secret: supabaseServiceKey,
-  });
-}
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config);

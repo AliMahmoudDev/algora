@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Globe, LogOut, LayoutDashboard, User } from 'lucide-react';
+import { Menu, X, Globe, LogOut, LayoutDashboard, User, Trophy } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
@@ -96,6 +96,13 @@ function AuthSection({
           >
             <User className="w-4 h-4 me-2" />
             {onProfileLabel}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onNavigate(`/${locale}/leaderboard`)}
+            className="text-algora-text-muted hover:text-algora-text-primary hover:bg-[rgba(255,255,255,0.05)] cursor-pointer focus:bg-[rgba(255,255,255,0.05)]"
+          >
+            <Trophy className="w-4 h-4 me-2" />
+            Leaderboard
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.08)]" />
           <DropdownMenuItem
@@ -323,6 +330,18 @@ export default function Navbar() {
                 >
                   <User className="w-4 h-4 me-2" />
                   {t('profile')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full text-algora-text-muted hover:text-algora-gold hover:bg-[rgba(255,255,255,0.05)] rounded-lg"
+                  size="sm"
+                  onClick={() => {
+                    router.push(`/${locale}/leaderboard`);
+                    setIsMobileOpen(false);
+                  }}
+                >
+                  <Trophy className="w-4 h-4 me-2" />
+                  Leaderboard
                 </Button>
                 <Button
                   variant="ghost"
