@@ -1,0 +1,79 @@
+# ============================================================
+# Algora CI Pipeline
+# Automatically builds and checks the project on every push
+# to main and on every Pull Request targeting main.
+# ============================================================
+
+name: CI
+
+# ---------- Trigger Rules ----------
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# ---------- Jobs ----------
+jobs:
+  build-and-test:
+    name: Build & Lint
+    runs-on: ubuntu-latest
+
+    # ---- Environment Variables (dummy values for CI build) ----
+    # These are needed because Next.js embeds NEXT_PUBLIC_* vars
+    # at build time, and Prisma needs DATABASE_URL for generate.
+    env:
+      DATABASE_URL: "file:./db/custom.db"
+      NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-key"
+
+    steps:
+      # 1) Checkout the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) Setup Bun runtime
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3"
+
+      # 3) Cache node_modules to speed up future runs
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      # 4) Install project dependencies
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # 5) Generate Prisma Client
+      #    This creates the TypeScript types from schema.prisma
+      #    so the build can find the Prisma imports.
+      - name: Generate Prisma Client
+        run: bunx prisma generate
+
+      # 6) Run ESLint to catch code quality issues
+      - name: Run Lint
+        run: bun run lint
+
+      # 7) Build the Next.js project
+      #    This is the main check: if build succeeds,
+      #    the project is structurally sound.
+      - name: Build Next.js
+        run: bun run build
+
+      # 8) Upload build logs if the build fails
+      #    This helps you see what went wrong directly
+      #    in the GitHub Actions UI without re-running.
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: .next/build.log
+          retention-days: 7
