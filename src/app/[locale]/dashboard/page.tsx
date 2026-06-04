@@ -19,7 +19,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { mockProblems, difficultyConfig, type Difficulty } from '@/data/mock-problems';
+import { difficultyConfig, type Difficulty } from '@/data/mock-problems';
 import type { Locale } from '@/i18n/routing';
 
 // Types for API response
@@ -56,6 +56,14 @@ interface RecentActivity {
 interface UserProblemStatus {
   problemId: string;
   status: string;
+}
+
+interface DBProblem {
+  id: string;
+  title: string;
+  titleAr: string;
+  difficulty: string;
+  orderIndex: number;
 }
 
 const emptyStats: DashboardStats = {
@@ -104,13 +112,15 @@ export default function DashboardPage() {
 
   const [stats, setStats] = useState<DashboardStats>(emptyStats);
   const [userProblemStatuses, setUserProblemStatuses] = useState<UserProblemStatus[]>([]);
+  const [dbProblems, setDbProblems] = useState<DBProblem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = useCallback(async (userId: string) => {
     try {
-      const [statsRes, userProblemsRes] = await Promise.all([
+      const [statsRes, userProblemsRes, problemsRes] = await Promise.all([
         fetch(`/api/dashboard/stats?userId=${userId}`),
         fetch(`/api/submissions?userId=${userId}`),
+        fetch(`/api/problems`),
       ]);
 
       if (statsRes.ok) {
@@ -121,8 +131,18 @@ export default function DashboardPage() {
       if (userProblemsRes.ok) {
         const submissions = await userProblemsRes.json();
         // Derive user problem statuses from submissions data
-        // We also need UserProblem data, but we can derive it from the stats
-        // For now, fetch the userProblems from the stats API (already included in skillBreakdown)
+      }
+
+      if (problemsRes.ok) {
+        const data = await problemsRes.json();
+        const problems: DBProblem[] = (data.problems || data || []).map((p: { id: string; title: string; titleAr: string; difficulty: string; orderIndex: number }) => ({
+          id: p.id,
+          title: p.title,
+          titleAr: p.titleAr,
+          difficulty: p.difficulty,
+          orderIndex: p.orderIndex,
+        }));
+        setDbProblems(problems);
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
@@ -175,7 +195,7 @@ export default function DashboardPage() {
     userProblemStatuses.filter(up => up.status === 'Solved').map(up => up.problemId)
   );
 
-  const unsolvedProblems = mockProblems.filter(p => !solvedIds.has(p.id));
+  const unsolvedProblems = dbProblems.filter(p => !solvedIds.has(p.id));
 
   // Calculate active days from current streak
   const activeDays = stats.currentStreak;
@@ -459,7 +479,7 @@ export default function DashboardPage() {
                     ))
                   ) : unsolvedProblems.length > 0 ? (
                     unsolvedProblems.map((problem) => {
-                      const config = difficultyConfig[problem.difficulty];
+                      const config = difficultyConfig[problem.difficulty as Difficulty];
                       return (
                         <div
                           key={problem.id}

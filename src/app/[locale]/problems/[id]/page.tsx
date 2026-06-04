@@ -228,6 +228,7 @@ export default function ProblemViewPage({ params }: { params: Promise<{ id: stri
           code: getCode(),
           language,
           problemId: problem.id,
+          userId: session?.user?.id,
         }),
       });
 

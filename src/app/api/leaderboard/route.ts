@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { mockProblems } from '@/data/mock-problems';
 
 // Points mapping by difficulty
 const POINTS_MAP: Record<string, number> = {
@@ -48,15 +47,17 @@ export async function GET() {
         // Get all solved user problems for this user
         const userSolved = solvedUserProblems.filter((up) => up.userId === userId);
 
-        // Calculate points using mock-problems difficulty lookup
+        // Calculate points using DB problem difficulty lookup
         let points = 0;
+        const problemIds = userSolved.map((up) => up.problemId);
+        const dbProblems = await db.problem.findMany({
+          where: { id: { in: problemIds } },
+          select: { id: true, difficulty: true },
+        });
+        const difficultyMap = new Map(dbProblems.map((p) => [p.id, p.difficulty]));
         for (const up of userSolved) {
-          const mockProblem = mockProblems.find((p) => p.id === up.problemId);
-          if (mockProblem) {
-            points += POINTS_MAP[mockProblem.difficulty] || 15; // fallback to avg 15
-          } else {
-            points += 15;
-          }
+          const difficulty = difficultyMap.get(up.problemId);
+          points += POINTS_MAP[difficulty || ''] || 15;
         }
 
         // Count total submissions

@@ -8,18 +8,25 @@ export async function GET(request: NextRequest) {
 
     // Return zeros if no userId
     if (!userId) {
+      // Count totals from DB even for anonymous
+      const [totalProblems, totalEasy, totalMedium, totalHard] = await Promise.all([
+        db.problem.count({ where: { isPublished: true } }),
+        db.problem.count({ where: { isPublished: true, difficulty: 'Easy' } }),
+        db.problem.count({ where: { isPublished: true, difficulty: 'Medium' } }),
+        db.problem.count({ where: { isPublished: true, difficulty: 'Hard' } }),
+      ]);
       return NextResponse.json({
         solved: 0,
         attempted: 0,
-        total: 14,
+        total: totalProblems,
         successRate: 0,
         currentStreak: 0,
         submissionsThisWeek: 0,
         recentActivity: [],
         skillBreakdown: {
-          Easy: { solved: 0, total: 5 },
-          Medium: { solved: 0, total: 7 },
-          Hard: { solved: 0, total: 2 },
+          Easy: { solved: 0, total: totalEasy },
+          Medium: { solved: 0, total: totalMedium },
+          Hard: { solved: 0, total: totalHard },
         },
       });
     }
@@ -34,6 +41,10 @@ export async function GET(request: NextRequest) {
       solvedMedium,
       solvedHard,
       weeklySubmissions,
+      totalEasy,
+      totalMedium,
+      totalHard,
+      totalProblems,
     ] = await Promise.all([
       // Solved problems count
       db.userProblem.count({
@@ -93,6 +104,11 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
+      // Total problem counts by difficulty
+      db.problem.count({ where: { isPublished: true, difficulty: 'Easy' } }),
+      db.problem.count({ where: { isPublished: true, difficulty: 'Medium' } }),
+      db.problem.count({ where: { isPublished: true, difficulty: 'Hard' } }),
+      db.problem.count({ where: { isPublished: true } }),
     ]);
 
     // Calculate success rate: solved / (solved + attempted) * 100
@@ -155,32 +171,33 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       solved: solvedCount,
       attempted: totalAttempted,
-      total: 14,
+      total: totalProblems,
       successRate,
       currentStreak,
       submissionsThisWeek: weeklySubmissions,
       recentActivity,
       skillBreakdown: {
-        Easy: { solved: solvedEasy, total: 5 },
-        Medium: { solved: solvedMedium, total: 7 },
-        Hard: { solved: solvedHard, total: 2 },
+        Easy: { solved: solvedEasy, total: totalEasy },
+        Medium: { solved: solvedMedium, total: totalMedium },
+        Hard: { solved: solvedHard, total: totalHard },
       },
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);
     // Return zeros on error instead of crashing
+    const fallbackTotals = await db.problem.count({ where: { isPublished: true } }).catch(() => 14);
     return NextResponse.json({
       solved: 0,
       attempted: 0,
-      total: 14,
+      total: fallbackTotals,
       successRate: 0,
       currentStreak: 0,
       submissionsThisWeek: 0,
       recentActivity: [],
       skillBreakdown: {
-        Easy: { solved: 0, total: 5 },
-        Medium: { solved: 0, total: 7 },
-        Hard: { solved: 0, total: 2 },
+        Easy: { solved: 0, total: Math.ceil(fallbackTotals * 0.36) },
+        Medium: { solved: 0, total: Math.ceil(fallbackTotals * 0.5) },
+        Hard: { solved: 0, total: Math.floor(fallbackTotals * 0.14) },
       },
     });
   }

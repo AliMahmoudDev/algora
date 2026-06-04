@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeCode, SUPPORTED_LANGUAGES } from '@/lib/judge0';
-import { getProblemById } from '@/data/mock-problems';
 import { db } from '@/lib/db';
 
 interface TestCaseResult {
@@ -29,8 +28,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Look up the problem from mock-problems
-    const problem = getProblemById(problemId);
+    // Look up the problem from database
+    const problem = await db.problem.findUnique({
+      where: { id: problemId },
+    });
     if (!problem) {
       return NextResponse.json(
         { error: `Problem not found with id: ${problemId}` },
@@ -38,12 +39,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const testCases = problem.examples;
-    if (!testCases || testCases.length === 0) {
-      return NextResponse.json(
-        { error: 'No test cases available for this problem' },
-        { status: 400 }
-      );
+    // Parse testCases from JSON string
+    let testCases: { input: string; output: string }[] = [];
+    try {
+      testCases = typeof problem.testCases === 'string'
+        ? JSON.parse(problem.testCases)
+        : (problem.testCases as { input: string; output: string }[] || []);
+    } catch {
+      testCases = [];
     }
 
     const results: TestCaseResult[] = [];
