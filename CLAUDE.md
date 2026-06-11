@@ -602,7 +602,7 @@ SQLite is ephemeral on Vercel — the DB file is wiped on each deployment. For p
 ### Git
 - **Branch:** All work on `main` (feature branches for large changes)
 - **Commit messages:** Conventional commits (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `style:`, `test:`, `ci:`)
-- **Author:** `z` user (`git config user.name "z" && git config user.email "z@users.noreply.github.com"`)
+- **Author:** `AliMahmoudDev` (`git config user.name "AliMahmoudDev" && git config user.email "AliMahmoudDev@users.noreply.github.com"`)
 - **Push:** Always push to `origin main` after each unit of work
 - **CI:** Must pass green (lint + build)
 
@@ -771,5 +771,6 @@ SQLite is ephemeral on Vercel — the DB file is wiped on each deployment. For p
 8. **shadcn/ui components** — Never edit files in `src/components/ui/` manually; use CLI
 9. **JSON DB fields** — Always stringify before write, parse after read
 10. **Conventional commits** — Use `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, etc.
-11. **Before each session** — Run `git pull` to avoid merge conflicts
-12. **After each session** — Update this file (progress, decisions, session notes)
+11. **Git author** — Always use `AliMahmoudDev` as git user
+12. **Before each session** — Run `git pull` to avoid merge conflicts
+13. **After each session** — Update this file (progress, decisions, session notes)
