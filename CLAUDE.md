@@ -1102,205 +1102,158 @@ SQLite is ephemeral on Vercel — the DB file is wiped on each deployment. For p
 
 ## Current Progress & Status
 
-### What's Built and Working
+### Completed Milestones
+- Landing page (bilingual, all sections, animations)
+- Authentication (NextAuth v5: Credentials + GitHub + Google OAuth)
+- Problem set (14 seeded problems: 5 Easy, 7 Medium, 2 Hard)
+- Code execution (Judge0 CE: Python, JS, C++, Java)
+- Monaco code editor with Run/Submit
+- Problem listing (search, filter, paginate)
+- Dashboard (stats, activity, skill breakdown)
+- Leaderboard (points system, podium, table)
+- Profile (bio, activity calendar, skills)
+- Submissions history
+- i18n (full EN + AR with RTL support)
+- Rate limiting (Upstash Ratelimit with fallback)
+- Gemini AI Hints (rich prompt, 3 hint levels, bilingual)
+- Sentry error tracking (client/server/edge config)
+- CI/CD pipeline (GitHub Actions)
 
-- Landing page with all sections (Hero, Features, Stats, Problems, HowItWorks, CTA, Footer)
-- Full i18n (Arabic RTL + English LTR) with 14 translation namespaces
-- Authentication (NextAuth v5: Credentials + GitHub + Google)
-- 14 problems seeded in DB with bilingual content
-- Problem listing (search, filter, sort, paginate — 6/page)
-- Problem view (split-pane: description + Monaco editor, 4 languages, Run/Submit)
-- Real code execution via Judge0 CE (Run and Submit)
-- Submit flow: runs all test cases, saves to DB, updates UserProblem
-- Dashboard with real stats from DB (solved, attempted, streak, activity, skill breakdown)
-- Profile page (bio, 84-day activity calendar, skill tags)
-- Settings page (editor prefs, language, theme, danger zone)
-- Leaderboard with points system (Easy=10, Medium=25, Hard=50)
-- Submissions history page
-- All navigation buttons functional (fixed 15+ dead links)
-- All API routes wired to DB (no mock data dependencies)
-- CI/CD pipeline (GitHub Actions: lint + build)
-- Deployed on Vercel at algora-io.vercel.app
-
-### What Uses Mock Data (Still Reference Only)
-- `src/data/mock-problems.ts` — 14 problems used ONLY by seed script and some styling configs
-  - `difficultyOrder`, `difficultyConfig`, `categoryList` exports are still used by dashboard page for styling
-  - All API routes fetch from DB, NOT from this file
-
-### Known Technical Debt
-1. `src/lib/piston.ts` — DELETED (was duplicate of judge0.ts)
-2. `src/hooks/use-auth.ts` — Legacy Supabase hook, not actively used
-3. `src/lib/supabase/` — Legacy Supabase clients, not actively used for auth
-4. `ignoreBuildErrors: true` in next.config.ts — TypeScript errors suppressed
-5. `noImplicitAny: false` in tsconfig.json — Should be tightened
-6. Dual config: `tailwind.config.ts` (v3-style) + `@tailwindcss/postcss` (v4-style active)
-7. Console.error calls in client-side code should use proper error handling
-
----
+### What's Working
+- All API routes compile and build successfully
+- Judge0 submit flow is correct (status.id → statusCode mapping verified)
+- Rate limiting active on /api/execute, /api/submit, /api/ai-hint
+- Gemini AI Hints API ready (awaiting DSN for Sentry on Vercel)
 
 ## Pending Tasks
 
-### High Priority
-- [ ] **Remove `@auth/supabase-adapter`** from package.json (dead dependency)
-- [ ] **Database persistence strategy** — SQLite is ephemeral on Vercel, need production solution
+### Phase 2 — Admin Panel & Content
+- [ ] Admin panel for managing problems (CRUD)
+- [ ] AI Hints UI button in Problem View (call /api/ai-hint from frontend)
+- [ ] Add 36+ more problems (target: 50+)
+- [ ] Editorial solutions for each problem
+- [ ] Problem bookmarks/favorites
 
-### Medium Priority
-- [ ] **SEO Enhancement** — Open Graph meta tags, structured data (JSON-LD), per-page `generateMetadata`
-- [ ] **Rate limiting** on `/api/execute` and `/api/submit`
-- [ ] **Clean up client-side console.error** → proper error handling/toast
-- [ ] **Remove Supabase legacy code** (`src/lib/supabase/`, `src/hooks/use-auth.ts`)
-- [ ] **Update .env.local.example** to remove Supabase vars
+### Phase 3 — Production Infrastructure
+- [ ] Migrate SQLite → Supabase PostgreSQL (production DB)
+- [ ] Configure Upstash Redis on Vercel (not just .env)
+- [ ] Set up Sentry DSN on Vercel dashboard
+- [ ] Add PostHog analytics
+- [ ] Configure Resend for transactional emails
+- [ ] Email verification flow
 
-### Low Priority
-- [ ] Fix `ignoreBuildErrors` → resolve actual TypeScript errors
-- [ ] Tighten `noImplicitAny: true` in tsconfig.json
-- [ ] CSP headers (Content Security Policy)
-- [ ] CORS configuration for API routes
-- [ ] Error tracking (Sentry or similar)
-- [ ] Analytics (Vercel Analytics or Google Analytics)
+### Phase 4 — Competitive Features
+- [ ] Contest mode (timed problem sets)
+- [ ] Real-time leaderboard with WebSocket (Ably)
+- [ ] User rankings by country
+- [ ] Achievement/badge system
+- [ ] Discussion forum per problem
 
----
+## Future Ideas & Roadmap
 
-## Development Roadmap
+### Short-term (next 2 weeks)
+1. Admin panel for problem CRUD
+2. AI Hints button in Problem View UI
+3. Add more problems to reach 50+
+4. Sentry DSN on Vercel
 
-### Phase 0: Bug Fixes (DONE — Jun 11, 2026)
-- [x] Fix Submit Bug #1: Judge0 status code check was treating Accepted(3) and Wrong Answer(4) as Runtime Error
-- [x] Fix Submit Bug #2: testCases field name mismatch (seed stores `expectedOutput`, submit read `output`)
-- [x] Fix db.ts: Query logging only in development (was always-on)
+### Medium-term (next month)
+1. Supabase PostgreSQL migration
+2. Email verification
+3. PostHog analytics dashboard
+4. Contest mode
 
-### Phase 1: Core Infrastructure (DONE — Jun 11, 2026)
-- [x] Install `@sentry/nextjs` for production error tracking (needs SENTRY_DSN env var)
-- [x] Install `@upstash/ratelimit` + `@upstash/redis` for API rate limiting (needs UPSTASH env vars)
-- [x] Install `@google/generative-ai` for Gemini API AI hints (needs GEMINI_API_KEY env var)
-- [x] Create `src/lib/rate-limit.ts` — rate limiter utility (execute: 20/min, submit: 10/min, ai-hint: 5/min)
-- [x] Create `src/app/api/ai-hint/route.ts` — POST endpoint for AI code hints
-- [x] Add rate limiting to `/api/execute` and `/api/submit`
-- [x] Update `.env.local.example` with all new env vars
-
-### Phase 2: Features (Next)
-1. **Admin Panel** — UI for CRUD operations on problems (add, edit, delete, toggle published)
-2. **More Problems** — Expand from 14 to 50+ problems across all difficulties
-3. **SEO** — Open Graph, Twitter cards, structured data (JSON-LD), per-page `generateMetadata`
-4. **AI Hints UI** — "Get Hint" button in problem view page that calls `/api/ai-hint`
-5. **Editorial Solutions** — Expert-written solution explanations in Arabic and English
-
-### Phase 3: Scale & Analytics
-6. **Supabase PostgreSQL** — Migrate from SQLite for production persistence on Vercel
-7. **Upstash Redis** — Cache problems, leaderboard, AI hint responses
-8. **PostHog Analytics** — Track solve rates, language distribution, time-per-problem (1M events/month free)
-9. **Resend Email** — Welcome emails, contest notifications (3,000/month free)
-10. **Vitest + Playwright** — Unit tests + E2E tests for critical flows
-
-### Phase 4: Growth Features
-11. **Achievements/Badges** — Milestone badges (first solve, 7-day streak, all-easy, etc.)
-12. **Contest Mode** — Timed competitions with live leaderboard (Ably: 6M messages/month free)
-13. **Custom Domain** — Configure `algora.dev` on Vercel
-14. **Community Discussions** — Problem discussion threads, user comments
-15. **Judge0 Self-Host** — Self-host Judge0 for unlimited code executions
-
-
-### Phase 5: Long-Term
-16. **Video Editorials** — Embedded video explanations for select problems
-17. **Pair Programming** — Real-time collaborative code editor (WebSocket, Y.js)
-18. **Mobile App** — React Native or PWA for practicing on mobile
-19. **Export to Resume** — Generate PDF summary of solved problems and ranking
-20. **Notification System** — Email/webhook notifications for contest starts, new problems
-
-
-### Tools Installed (Free Tiers)
-| Tool | Package | Free Tier | Status | Needs |
-|---|---|---|---|---|
-| Sentry | `@sentry/nextjs` | 5K errors/month | Installed, needs setup | SENTRY_DSN, SENTRY_ORG, SENTRY_PROJECT |
-| Upstash Ratelimit | `@upstash/ratelimit` | 500K commands/month | Active on execute, submit, ai-hint | UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN |
-| Upstash Redis | `@upstash/redis` | 10K commands/day | Installed (dependency of ratelimit) | Same as above |
-| Gemini AI | `@google/generative-ai` | 10 RPM (Flash) | Active on /api/ai-hint | GEMINI_API_KEY |
-
-### Tools Planned (Not Yet Installed)
-| Tool | Free Tier | Priority | Benefit |
-|---|---|---|---|
-| PostHog | 1M events/month | Phase 3 | Analytics, feature flags, A/B testing, session replay |
-| Resend | 3,000 emails/month | Phase 3 | Welcome emails, contest notifications |
-| Vitest + Playwright | Free (open source) | Phase 3 | Unit tests + E2E tests |
-| Supabase PostgreSQL | 500 MB, unlimited requests | Phase 3 | Production database (replace SQLite) |
-| Ably | 6M messages/month | Phase 4 | Real-time contest leaderboard |
-| OpenRouter | Free models available | Phase 4 | Multi-model AI fallback |
-
----
+### Long-term (next quarter)
+1. Mobile app (React Native / PWA)
+2. Multi-language editor tabs
+3. Company/organization dashboard
+4. Open-source contribution system
 
 ## Open Questions
 
-1. **Database for production:** Supabase PostgreSQL or Vercel Postgres? SQLite is ephemeral on Vercel.
-2. **Custom domain:** When will `algora.dev` be configured? DNS + Vercel setup needed.
-3. **Rate limiting strategy:** Vercel middleware, external service, or in-memory?
-4. **Problem images:** Should problems support diagram images? Where to store?
-5. **User avatars:** Currently OAuth only. Allow custom avatar uploads?
-6. **Mobile PWA:** Add PWA manifest for "Add to Home Screen"?
-7. **More languages:** Add Go, Rust, TypeScript, C# support in Judge0?
-8. **Collaborative features:** Real-time pair programming — what technology? (WebSocket, CRDT, Y.js?)
-9. **Monetization strategy:** Free forever, or premium features (contest hosting, company accounts)?
-
----
+1. **Sentry DSN**: Need to create Sentry project and add DSN to Vercel env vars
+2. **Supabase**: When to migrate from SQLite? (recommended before public launch)
+3. **Monaco Editor**: Should we upgrade to multi-file editor tabs?
+4. **Problem sources**: Where to get more problems? (curated or community submissions?)
+5. **Rate limit values**: Are 20/10/5 RPM good for execute/submit/ai-hint? (monitor after launch)
 
 ## Architecture Decisions Log
 
-| Decision | Rationale | Date |
+| Date | Decision | Rationale |
 |---|---|---|
-| SQLite for initial development | Simpler setup, no external service, file-based for easy local dev | Jan 2025 |
-| NextAuth over Supabase Auth | More flexible providers, JWT without external service, better middleware | Jan 2025 |
-| Judge0 CE over Piston | Free, no API key, supports all 4 languages, reliable | Jan 2025 |
-| Monaco Editor over CodeMirror | VS Code-grade experience, built-in autocomplete, better language support | Jan 2025 |
-| Bun over npm/yarn/pnpm | Faster installs, built-in TypeScript, project uses bun.lock | Jan 2025 |
-| Dark theme only | Matches CP aesthetic (LeetCode-like), reduces complexity | Jan 2025 |
-| next-intl over react-i18next | Better App Router integration, automatic locale routing | Jan 2025 |
-| Gold accent (#F59E0B) | Distinctive, premium feel, stands out from blue/purple tools | Jan 2025 |
-| Standalone output mode | Required for Vercel deployment with Bun runtime | Jan 2025 |
-| Removed Supabase Auth | Dual auth was conflicting; unified on NextAuth only | Jun 2025 |
-| Phased out mock-problems.ts from APIs | All API routes now query DB directly; mock kept as seed reference only | Jun 2025 |
-| Fixed 15+ dead navigation buttons | Wired all buttons to real routes with next/link + locale prefix | Jun 2025 |
-
----
+| Jun 2025 | SQLite + Prisma for dev | Simple, no server needed, easy local dev |
+| Jun 2025 | Judge0 CE for execution | Free, no API key, reliable enough |
+| Jun 2025 | next-intl v4.13 | Best i18n for Next.js App Router |
+| Jun 2025 | Dark-only theme | CP platforms are always dark |
+| Jun 2025 | Upstash HTTP Ratelimit | Serverless-compatible, no persistent Redis needed |
+| Jun 2025 | @google/genai for Gemini | New SDK per user preference, cleaner API |
+| Jun 2025 | Manual Sentry config (no wizard) | More control, silent/hideSourceMaps options |
+| Jun 2025 | db.ts logs error/warn only (not query) | Production performance |
 
 ## Session History
 
-### Session 2 (Jun 11, 2026) — Navigation Fixes + Backend Wiring + Context File
-- Fixed 15 dead buttons/links (HeroSection, CTASection, ProblemsSection, Navbar, Footer)
-- Fixed Dashboard button routing (was `/problems`, now `/dashboard`)
-- Replaced all `<a>` with `<Link>` for client-side routing
-- Initialized DB (`prisma db push + seed`) — 14 problems in SQLite
-- Wired Submit to send userId → submissions persist in DB
-- Migrated `/api/submit` to use DB testCases
-- Migrated `/api/leaderboard` to use DB difficulty for points
-- Migrated `/api/dashboard/stats` to use dynamic totals from DB
-- Migrated Dashboard page to fetch problems from API instead of mock
-- Deleted `src/lib/piston.ts` (dead duplicate code)
-- Created comprehensive CLAUDE.md project context file
-- **Push:** Commits on main
+### Session 6 — June 11, 2026
+**Tasks completed:**
+1. Phase 0: Verified submit flow is correct (judge0.ts maps status.id → statusCode properly)
+2. Phase 0: Fixed db.ts logging (removed `['query']`, now `['error', 'warn']` in dev, `['error']` in prod)
+3. Phase 1: Installed `@google/genai@2.8.0` — new Gemini SDK
+4. Phase 1: Rewrote `/api/ai-hint/route.ts` with rich prompt (feeds problem description, examples, constraints, tags, user code) + 3 hint levels + bilingual support + returns hint/concept/complexity/nextStep
+5. Phase 1: Configured Upstash Redis credentials in `.env`
+6. Phase 1: Installed Sentry (`@sentry/nextjs`), created `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`
+7. Phase 1: Updated `next.config.ts` with `withSentryConfig` wrapper
+8. Phase 1: Updated `.env.local.example` with all new env vars
+9. Build verified: all 29 routes compile successfully
 
-### Session 1 (Jun 11, 2026) — Continued from previous context
-- Fixed non-functional navigation buttons across the app
-- Performed full project audit
-- Removed all mock-data dependencies from API routes
-- Wired everything to real database
+**Files changed:**
+- `src/lib/db.ts` — logging fix
+- `src/app/api/ai-hint/route.ts` — complete rewrite with @google/genai
+- `sentry.client.config.ts` — new
+- `sentry.server.config.ts` — new
+- `sentry.edge.config.ts` — new
+- `next.config.ts` — Sentry wrapper added
+- `.env` — Gemini API key + Upstash credentials added
+- `.env.local.example` — updated with all env var docs
+- `package.json` — @google/genai added
 
-### Session 0 (Jan 2025) — Initial Development
-- Built entire project from scratch through multiple sessions
-- Created CI pipeline, fixed ESLint errors, cleaned up repo
-- Completed Phases 1-7 (Foundation → Landing → Problems/Editor → Auth → User Features → CI/CD → Polish)
+### Session 5 — June 10-11, 2026
+**Tasks completed:**
+1. Created CLAUDE.md as master project context (merged all 10 original context files)
+2. Removed 28 junk files from git
+3. Configured git author as AliMahmoudDev
+4. Audited codebase — verified submit flow logic
+5. Researched and cataloged 10+ free APIs/tools
+6. Created 5-phase implementation plan
 
----
+### Session 4 — Phase 2 Implementation
+**Tasks completed:**
+1. Built Dashboard page (stats, activity, skill breakdown)
+2. Built Profile page (bio, activity calendar)
+3. Built Submissions page
+4. Built Leaderboard (podium + table)
+5. Added all API routes for dashboard, profile, submissions, leaderboard
+6. Created rate limiting with Upstash Ratelimit
 
-## Important Notes for AI Assistants
+### Session 3 — Auth & Problems
+**Tasks completed:**
+1. Set up NextAuth v5 (Credentials + GitHub + Google)
+2. Built Sign In/Sign Up pages
+3. Built Problems listing page with search/filter
+4. Built Problem View page with Monaco editor
+5. Connected Judge0 CE for code execution
+6. Created submit flow with test case evaluation
 
-1. **Bilingual is mandatory** — Every new user-facing string needs both EN and AR translations
-2. **Dark theme only** — Never add light mode
-3. **Gold accent (#F59E0B)** is the brand identity — use for primary CTAs
-4. **Judge0 CE only** — Never switch code execution provider without approval
-5. **SQLite for now** — Schema must be SQLite-compatible
-6. **No Supabase Auth** — Only NextAuth is the auth provider
-7. **next/link always** — Never use `<a href>` for internal navigation
-8. **shadcn/ui components** — Never edit files in `src/components/ui/` manually; use CLI
-9. **JSON DB fields** — Always stringify before write, parse after read
-10. **Conventional commits** — Use `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, etc.
-11. **Git author** — Always use `AliMahmoudDev` as git user
-12. **Before each session** — Run `git pull` to avoid merge conflicts
-13. **After each session** — Update this file (progress, decisions, session notes)
+### Session 2 — Landing Page
+**Tasks completed:**
+1. Built all landing page sections (Hero, Features, Stats, Problems, HowItWorks, CTA)
+2. Set up dark theme with custom CSS variables
+3. Added animations and responsive design
+4. Created Navbar and Footer components
+
+### Session 1 — Project Setup
+**Tasks completed:**
+1. Initialized Next.js 16 with App Router and Bun
+2. Set up Tailwind CSS v4 + shadcn/ui (48 components)
+3. Set up next-intl for bilingual support (EN + AR)
+4. Created Prisma schema with SQLite
+5. Set up CI/CD with GitHub Actions
+6. Deployed to Vercel

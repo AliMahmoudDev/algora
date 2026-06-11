@@ -1,7 +1,7 @@
 // Algora AI Hints — powered by Google Gemini
 // Provides bilingual (Arabic/English) code hints for algorithmic problems
 //
-// Uses Gemini 2.5 Flash (free tier: 10 RPM)
+// Uses @google/genai (new SDK) with Gemini 3.5 Flash
 // Falls back gracefully if API key is not configured
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,11 +13,12 @@ interface HintRequest {
   code: string;
   language: string;
   locale?: 'en' | 'ar';
+  hintLevel?: number; // 1, 2, or 3 — progressive hints
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
+    // Rate limiting (5 req/min per IP)
     const ip = request.headers.get('x-forwarded-for') || 'anonymous';
     const rateLimitResult = await checkRateLimit(aiHintLimiter, ip);
     if (!rateLimitResult.success) {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: HintRequest = await request.json();
-    const { problemId, code, language, locale = 'en' } = body;
+    const { problemId, code, language, locale = 'en', hintLevel = 1 } = body;
 
     if (!problemId || !code) {
       return NextResponse.json(
@@ -57,62 +58,101 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Build the prompt based on locale
+    // Parse examples and constraints for richer context
+    let examples: Array<{ input: string; output: string; explanation?: string }> = [];
+    try {
+      examples = typeof problem.examples === 'string'
+        ? JSON.parse(problem.examples)
+        : (problem.examples as typeof examples || []);
+    } catch { /* empty */ }
+
+    let constraints = problem.constraints || '';
+    if (locale === 'ar' && problem.constraintsAr) {
+      constraints = problem.constraintsAr;
+    }
+
+    const tags: string[] = typeof problem.tags === 'string'
+      ? JSON.parse(problem.tags)
+      : [];
+
+    // Build a rich, well-structured prompt for maximum accuracy
     const langInstruction = locale === 'ar'
-      ? 'أجب باللغة العربية. اكتب الشرح والكود بالعربي.'
+      ? 'أجب باللغة العربية. اكتب الشرح بالعربي والأكواد بالإنجليزي.'
       : 'Answer in English.';
 
-    const prompt = `You are an AI programming tutor for a competitive coding platform called Algora.
+    const hintLevelInstruction = hintLevel === 1
+      ? 'Give a gentle, conceptual hint. Point the user toward the right data structure or algorithm pattern without any code.'
+      : hintLevel === 2
+      ? 'Give a more specific hint. Explain the approach in 2-3 steps, mention edge cases, but do NOT write the full solution code.'
+      : 'Give a near-solution hint. Explain the algorithm in detail with pseudocode. The user can figure out the last pieces themselves.';
+
+    const prompt = `You are Algora's AI Tutor — a friendly, expert programming coach for a competitive coding platform.
 ${langInstruction}
 
-A user is working on this problem:
-Title: ${problem.title}
-Difficulty: ${problem.difficulty}
-Category: ${problem.category}
-Description (first 500 chars): ${(problem.description || '').slice(0, 500)}
+## Problem Information
+- **Title:** ${problem.title} (${problem.titleAr || ''})
+- **Difficulty:** ${problem.difficulty}
+- **Category:** ${problem.category}
+- **Tags:** ${tags.join(', ')}
+- **Constraints:** ${constraints || 'None specified'}
 
-The user's current code in ${language}:
+## Problem Description (${locale === 'ar' ? 'Arabic' : 'English'})
+${(locale === 'ar' ? problem.descriptionAr : problem.description || '').slice(0, 1000)}
+
+## Examples
+${examples.slice(0, 3).map((ex, i) => `Example ${i + 1}:\n  Input: ${ex.input}\n  Output: ${ex.output}${ex.explanation ? '\n  Explanation: ' + ex.explanation : ''}`).join('\n\n')}
+
+## User's Current Code (${language})
 \`\`\`${language}
-${code.slice(0, 2000)}
+${code.slice(0, 3000)}
 \`\`\`
 
-Provide a helpful hint that guides the user without giving away the full solution.
+## Instructions
+${hintLevelInstruction}
+
 Your hint should:
-1. Be encouraging and educational
-2. Point the user in the right direction (algorithm/approach)
-3. NOT give the complete solution code
-4. Be concise (max 3-4 sentences)
-5. Mention a relevant concept or data structure if helpful
+1. Be encouraging and educational — build confidence
+2. Analyze what the user's code is doing and identify where it might be going wrong
+3. Suggest the correct approach, data structure, or algorithmic technique
+4. Mention relevant time/space complexity considerations
+5. Be concise (3-5 sentences max for level 1, up to 6 sentences for level 2, up to 8 for level 3)
+6. NEVER give the complete working solution code
 
-Respond in this exact JSON format (no markdown, no code fences):
-{"hint": "your hint text here", "concept": "relevant concept name"}`;
+Respond in this exact JSON format (no markdown fences, no extra text):
+{"hint": "your hint text here", "concept": "relevant concept name", "complexity": "time/space complexity if relevant", "nextStep": "what the user should try next"}
 
-    // Call Gemini API
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-05-20' });
+IMPORTANT: Return ONLY the JSON object, nothing else. No \`\`\`json markers.`;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text().trim();
+    // Call Gemini API using @google/genai (new SDK)
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    // Parse the JSON response (handle possible markdown fences)
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+
+    const responseText = (response.text || '').trim();
+
+    // Parse the JSON response
     let parsed;
     try {
-      // Try to extract JSON from the response (may have ```json fences)
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsed = JSON.parse(jsonMatch[0]);
       } else {
-        // Fallback: use the raw text as hint
-        parsed = { hint: responseText, concept: '' };
+        parsed = { hint: responseText, concept: '', complexity: '', nextStep: '' };
       }
     } catch {
-      parsed = { hint: responseText, concept: '' };
+      parsed = { hint: responseText, concept: '', complexity: '', nextStep: '' };
     }
 
     return NextResponse.json({
       hint: parsed.hint || responseText,
       concept: parsed.concept || '',
+      complexity: parsed.complexity || '',
+      nextStep: parsed.nextStep || '',
+      hintLevel,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to generate hint';
