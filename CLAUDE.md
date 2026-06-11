@@ -14,20 +14,22 @@
 3. [Architecture & File Structure](#architecture--file-structure)
 4. [Database Schema](#database-schema)
 5. [API Routes](#api-routes)
-6. [Design System](#design-system)
-7. [Internationalization (i18n)](#internationalization-i18n)
-8. [Authentication](#authentication)
-9. [Code Execution (Judge0 CE)](#code-execution-judge0-ce)
-10. [Development Commands](#development-commands)
-11. [CI/CD Pipeline](#cicd-pipeline)
-12. [Deployment](#deployment)
-13. [Code Standards & Conventions](#code-standards--conventions)
-14. [Current Progress & Status](#current-progress--status)
-15. [Pending Tasks](#pending-tasks)
-16. [Future Ideas & Roadmap](#future-ideas--roadmap)
-17. [Open Questions](#open-questions)
-18. [Architecture Decisions Log](#architecture-decisions-log)
-19. [Session History](#session-history)
+6. [API Contracts (Detailed)](#api-contracts-detailed)
+7. [Design System](#design-system)
+8. [Internationalization (i18n)](#internationalization-i18n)
+9. [Content Copy (Full EN/AR)](#content-copy-full-enar-reference)
+10. [Authentication](#authentication)
+11. [Code Execution (Judge0 CE)](#code-execution-judge0-ce)
+12. [Development Commands](#development-commands)
+13. [CI/CD Pipeline](#cicd-pipeline)
+14. [Deployment](#deployment)
+15. [Code Standards & Conventions](#code-standards--conventions)
+16. [Current Progress & Status](#current-progress--status)
+17. [Pending Tasks](#pending-tasks)
+18. [Future Ideas & Roadmap](#future-ideas--roadmap)
+19. [Open Questions](#open-questions)
+20. [Architecture Decisions Log](#architecture-decisions-log)
+21. [Session History](#session-history)
 
 ---
 
@@ -315,6 +317,289 @@ All API routes are under `src/app/api/`. Response format: `{ data: ... }` for su
 
 ---
 
+## API Contracts (Detailed)
+
+### Base URL
+- Development: `http://localhost:3000/api`
+- Production: `https://algora-io.vercel.app/api`
+
+### Response Format
+- Success: `{ "data": { ... } }`
+- Error: `{ "error": "Human-readable error message" }`
+
+### HTTP Status Codes
+| Code | Meaning |
+|---|---|
+| 200 | Success |
+| 201 | Created (signup, submission) |
+| 400 | Bad Request (missing/invalid fields) |
+| 401 | Unauthorized |
+| 404 | Not Found |
+| 409 | Conflict (duplicate email/signup) |
+| 500 | Internal Server Error |
+
+---
+
+#### `GET /api`
+- **Auth:** None
+- **Response:** `{ "message": "Hello, world!" }`
+
+---
+
+#### `POST /api/auth/[...nextauth]`
+- **Auth:** None (handled by NextAuth internally)
+- **Body:** Varies by action
+- **Response:** NextAuth standard session/token response
+
+---
+
+#### `POST /api/auth/signup`
+- **Auth:** None
+- **Body:**
+```json
+{
+  "name": "Ali Mahmoud",
+  "email": "ali@example.com",
+  "password": "securepassword123"
+}
+```
+- **Validation:** name (required), email (valid format, unique), password (min 8 chars)
+- **Response (201):**
+```json
+{
+  "id": "clx...",
+  "email": "ali@example.com",
+  "name": "Ali Mahmoud",
+  "image": null,
+  "bio": "",
+  "createdAt": "2025-01-15T...",
+  "updatedAt": "2025-01-15T..."
+}
+```
+- **Errors:** 400 (validation), 409 (email exists)
+
+---
+
+#### `GET /api/problems`
+- **Auth:** None
+- **Query Params:**
+  - No params → All published problems ordered by `orderIndex`
+  - `?id=clx...` → Single problem by ID
+  - `?slug=two-sum` → Single problem by slug
+- **Response (all):**
+```json
+{
+  "problems": [
+    {
+      "id": "clx...",
+      "title": "Two Sum",
+      "titleAr": "مجموع عددين",
+      "slug": "two-sum",
+      "description": "## Description\n...",
+      "descriptionAr": "## الوصف\n...",
+      "difficulty": "Easy",
+      "category": "Hash Table",
+      "tags": ["Array", "Hash Map"],
+      "examples": [{ "input": "nums = [2,7,11,15], target = 9", "output": "[0,1]", "explanation": "Because nums[0] + nums[1] == 9" }],
+      "constraints": "2 <= nums.length <= ...",
+      "constraintsAr": "...",
+      "acceptanceRate": 78.5,
+      "starterCode": { "python": "def solution():\n    pass\n", "javascript": "function solution() {\n  \n}\n", "cpp": "...", "java": "..." },
+      "testCases": [{ "input": "2 7 11 15\n9", "expectedOutput": "0 1" }],
+      "orderIndex": 1,
+      "isPublished": true
+    }
+  ]
+}
+```
+- **Errors:** 404 (problem not found)
+
+---
+
+#### `POST /api/execute`
+- **Auth:** None
+- **Body:**
+```json
+{
+  "code": "def solve():\n    print('hello')\n\nsolve()",
+  "language": "python",
+  "stdin": "some input"
+}
+```
+- **Supported Languages:** `python` (71), `javascript` (63), `cpp` (54), `java` (62)
+- **Response:**
+```json
+{
+  "stdout": "hello\n",
+  "stderr": "",
+  "compile_output": "",
+  "statusCode": 0,
+  "statusDescription": "Accepted",
+  "time": "0.04",
+  "memory": 3400
+}
+```
+- **Errors:** 400 (missing fields, unsupported language), 500 (Judge0 timeout)
+
+---
+
+#### `POST /api/submit`
+- **Auth:** Optional (userId in body enables DB persistence)
+- **Body:**
+```json
+{
+  "code": "def twoSum(nums, target):\n    ...",
+  "language": "python",
+  "problemId": "clx...",
+  "userId": "user_cuid..."
+}
+```
+- **Process:** Fetch problem → Parse testCases → Run each via Judge0 → Compare stdout → Save submission → Update UserProblem
+- **Response:**
+```json
+{
+  "status": "Accepted",
+  "testCasesPassed": 3,
+  "testCasesTotal": 3,
+  "results": [
+    { "input": "2 7 11 15\n9", "expected": "0 1", "actual": "0 1", "passed": true },
+    { "input": "3 2 4\n6", "expected": "1 2", "actual": "1 2", "passed": true },
+    { "input": "3 3\n6", "expected": "0 1", "actual": "0 1", "passed": true }
+  ],
+  "runtime": 0.05,
+  "memory": 3400,
+  "submissionId": "sub_cuid..."
+}
+```
+- **Errors:** 400 (missing fields, no test cases), 404 (problem not found), 500 (execution failed)
+
+---
+
+#### `GET /api/submissions`
+- **Auth:** Required (userId in query)
+- **Query:** `userId` (required), `problemId` (optional filter)
+- **Response:**
+```json
+[
+  {
+    "id": "sub_...",
+    "code": "def twoSum(...)",
+    "language": "python",
+    "status": "Accepted",
+    "runtime": 0.05,
+    "memory": 3400,
+    "testCasesPassed": 3,
+    "testCasesTotal": 3,
+    "createdAt": "2025-01-15T...",
+    "problem": {
+      "title": "Two Sum",
+      "titleAr": "مجموع عددين",
+      "slug": "two-sum",
+      "difficulty": "Easy"
+    }
+  }
+]
+```
+
+---
+
+#### `GET /api/user-problems`
+- **Auth:** Required (userId in query)
+- **Query:** `userId` (required)
+- **Response:**
+```json
+[
+  { "problemId": "clx...", "status": "Solved", "attempts": 3, "bestRuntime": 0.04, "bestMemory": 3200 },
+  { "problemId": "cly...", "status": "Attempted", "attempts": 1, "bestRuntime": null, "bestMemory": null }
+]
+```
+
+---
+
+#### `GET /api/profile`
+- **Auth:** Required (userId in query)
+- **Query:** `userId` (required)
+- **Response:**
+```json
+{
+  "user": { "id": "...", "name": "Ali", "email": "ali@...", "image": "...", "bio": "..." },
+  "stats": { "problemsSolved": 5, "totalSubmissions": 12, "successRate": 42, "currentStreak": 3 },
+  "activityData": [0, 0, 1, 2, 0, 1, 0, 0, ...],
+  "skillTags": ["Arrays", "Hash Table", "Dynamic Programming"],
+  "bio": "CS student passionate about algorithms"
+}
+```
+
+#### `PATCH /api/profile`
+- **Auth:** Required (userId in query)
+- **Query:** `userId` (required)
+- **Body:** `{ "bio": "Updated bio text (max 500 chars)" }`
+- **Response:** `{ "bio": "Updated bio text..." }`
+
+---
+
+#### `GET /api/leaderboard`
+- **Auth:** None
+- **Points:** Easy=10, Medium=25, Hard=50
+- **Response:**
+```json
+{
+  "data": [
+    {
+      "rank": 1,
+      "userId": "user_...",
+      "userName": "Ali Mahmoud",
+      "userImage": "https://...",
+      "problemsSolved": 12,
+      "totalSubmissions": 28,
+      "successRate": 43,
+      "points": 230,
+      "bestRuntime": 0.02
+    }
+  ]
+}
+```
+
+---
+
+#### `GET /api/dashboard/stats`
+- **Auth:** Optional (returns zeros without userId)
+- **Query:** `userId` (optional)
+- **Response:**
+```json
+{
+  "solved": 5,
+  "attempted": 8,
+  "total": 14,
+  "successRate": 63,
+  "currentStreak": 3,
+  "submissionsThisWeek": 4,
+  "recentActivity": [
+    {
+      "id": "sub_...",
+      "problemId": "clx...",
+      "problemTitle": "Two Sum",
+      "problemTitleAr": "مجموع عددين",
+      "problemDifficulty": "Easy",
+      "status": "accepted",
+      "language": "python",
+      "createdAt": "2025-01-15T...",
+      "runtime": 0.04,
+      "memory": 3200,
+      "testCasesPassed": 3,
+      "testCasesTotal": 3
+    }
+  ],
+  "skillBreakdown": {
+    "Easy": { "solved": 3, "total": 5 },
+    "Medium": { "solved": 2, "total": 7 },
+    "Hard": { "solved": 0, "total": 2 }
+  }
+}
+```
+
+---
+
 ## Design System
 
 ### Theme
@@ -403,6 +688,208 @@ All API routes are under `src/app/api/`. Response format: `{ data: ... }` for su
 - Every new user-facing string MUST have both EN and AR translations
 - Never hardcode English or Arabic text in components
 - Always update BOTH translation files simultaneously
+
+---
+
+## Content Copy (Full EN/AR Reference)
+
+### Global
+| Key | EN | AR |
+|---|---|---|
+| Site Name | Algora | ألجورا |
+| Tagline | Master Algorithms. Code the Future. | أتقن الخوارزميات. اكتب المستقبل. |
+| Brand Description | A bilingual learning platform for algorithms and problem-solving. Available in Arabic & English with AI-powered guidance. | منصة تعليمية ثنائية اللغة للخوارزميات وحل المسائل. متوفرة بالعربية والإنجليزية مع إرشادات ذكية. |
+
+### Navbar
+| Key | EN | AR |
+|---|---|---|
+| home | Home | الرئيسية |
+| problems | Problems | المسائل |
+| features | Features | المميزات |
+| about | About | عن المنصة |
+| signIn | Sign In | تسجيل الدخول |
+| signUp | Sign Up | إنشاء حساب |
+| profile | Profile | الملف الشخصي |
+| signOut | Sign Out | تسجيل الخروج |
+| dashboard | Dashboard | لوحة التحكم |
+| mobileMenu | Toggle menu | القائمة |
+
+### Hero Section
+| Key | EN | AR |
+|---|---|---|
+| badge | Now with AI-Powered Assistance | الآن مع مساعدة الذكاء الاصطناعي |
+| title1 | Master Algorithms. | أتقن الخوارزميات. |
+| title2 | Code the Future. | اصنع المستقبل. |
+| description | A bilingual learning platform for algorithms and problem-solving. Available in Arabic & English with AI-powered guidance. | منصة تعليمية ثنائية اللغة للخوارزميات وحل المشكلات. متاحة بالعربية والإنجليزية مع إرشاد مدعوم بالذكاء الاصطناعي. |
+| startSolving | Start Solving | ابدأ الحل |
+| viewProblems | View Problems | تصفح المسائل |
+| problems | Problems | مسألة |
+| languages | Languages | لغات |
+| powered | AI | ذكاء اصطناعي |
+| andGrowing | And Growing | في تزايد مستمر |
+
+### Features Section
+| Key | EN | AR |
+|---|---|---|
+| badge | Features | المميزات |
+| title | Everything You Need to | كل ما تحتاجه |
+| titleHighlight | Succeed | للنجاح |
+| aiAssistant.title | AI-Powered Assistant | مساعد بالذكاء الاصطناعي |
+| aiAssistant.description | Get step-by-step algorithm explanations from our AI chatbot. | احصل على شروحات خطوة بخطوة للخوارزميات من روبوت الدردشة الذكي. |
+| bilingual.title | Bilingual Learning | تعليم ثنائي اللغة |
+| bilingual.description | Full Arabic and English support with RTL layout. | دعم كامل للعربية والإنجليزية مع تخطيط RTL. |
+| editor.title | Real Code Editor | محرر أكواد حقيقي |
+| editor.description | Write, run, and debug code in a Monaco-style editor. | اكتب وشغّل واصحح أخطاء أكوادك في محرر على طراز Monaco. |
+
+### Stats Section
+| Key | EN | AR |
+|---|---|---|
+| algorithmicProblems | Algorithmic Problems | مسألة خوارزمية |
+| languagesSupported | Languages Supported | لغات مدعومة |
+| smartExplanations | Smart Explanations | شروحات ذكية |
+| learnAnytime | Learn Anytime | تعلم في أي وقت |
+| arabicEnglish | Arabic + English | العربية + الإنجليزية |
+| poweredAssistant | Powered Assistant | مساعد ذكي |
+| alwaysAvailable | Always Available | متاح دائماً |
+
+### Problems Section
+| Key | EN | AR |
+|---|---|---|
+| badge | Problems | المسائل |
+| title | Practice Real | تحدّيات حقيقية |
+| titleHighlight | Challenges | للتدريب |
+| viewAll | View all 50+ problems | عرض جميع المسائل 50+ |
+
+### How It Works
+| Key | EN | AR |
+|---|---|---|
+| badge | How It Works | كيف تعمل |
+| title | Start Learning in | ابدأ التعلم في |
+| titleHighlight | 3 Steps | 3 خطوات |
+| step1.title | Choose a Problem | اختر مسألة |
+| step1.description | Browse our curated library of algorithmic challenges. | تصفح مكتبتنا المختارة من التحديات الخوارزمية. |
+| step2.title | Write Your Solution | اكتب حلّك |
+| step2.description | Use our integrated code editor to write your solution. | استخدم محرر الأكواد المتكامل لكتابة حلّك. |
+| step3.title | Get AI Feedback | احصل على تقييم ذكي |
+| step3.description | Receive detailed, personalized feedback from our AI assistant. | استقبل ملاحظات مفصلة وشخصية من مساعدنا الذكي. |
+
+### CTA Section
+| Key | EN | AR |
+|---|---|---|
+| title | Ready to Start Your | مستعد لبدء |
+| titleHighlight | Journey | رحلتك؟ |
+| getStarted | Get Started — It's Free | ابدأ الآن — مجاناً |
+| noCreditCard | No credit card required · Free forever · Start solving in seconds | لا حاجة لبطاقة ائتمان · مجاني للأبد · ابدأ الحل في ثوانٍ |
+
+### Footer
+| Key | EN | AR |
+|---|---|---|
+| platform | Platform | المنصة |
+| resources | Resources | المصادر |
+| company | Company | الشركة |
+| problems | Problems | المسائل |
+| features | Features | المميزات |
+| pricing | Pricing | الأسعار |
+| documentation | Documentation | التوثيق |
+| blog | Blog | المدوّنة |
+| community | Community | المجتمع |
+| about | About | عن المنصة |
+| contact | Contact | اتصل بنا |
+| privacy | Privacy | الخصوصية |
+| copyright | © 2026 Algora. All rights reserved. | © 2026 ألغورا. جميع الحقوق محفوظة. |
+
+### Auth — Sign In
+| Key | EN | AR |
+|---|---|---|
+| title | Welcome Back | مرحباً بعودتك |
+| subtitle | Sign in to continue your learning journey | سجّل الدخول لمتابعة رحلة التعلم الخاصة بك |
+| email | Email Address | البريد الإلكتروني |
+| password | Password | كلمة المرور |
+| submit | Sign In | تسجيل الدخول |
+| noAccount | Don't have an account? | ليس لديك حساب؟ |
+| signUpLink | Sign Up | إنشاء حساب |
+| orContinueWith | Or continue with | أو تابع باستخدام |
+| github | Sign in with GitHub | تسجيل الدخول بواسطة GitHub |
+| google | Sign in with Google | تسجيل الدخول بواسطة Google |
+
+### Auth — Sign Up
+| Key | EN | AR |
+|---|---|---|
+| title | Create Your Account | أنشئ حسابك |
+| subtitle | Start your algorithmic journey today | ابدأ رحلتك الخوارزمية اليوم |
+| name | Full Name | الاسم الكامل |
+| confirmPassword | Confirm Password | تأكيد كلمة المرور |
+| submit | Create Account | إنشاء حساب |
+| hasAccount | Already have an account? | لديك حساب بالفعل؟ |
+| signInLink | Sign In | تسجيل الدخول |
+
+### Problems Page
+| Key | EN | AR |
+|---|---|---|
+| title | Problem Set | مجموعة المسائل |
+| subtitle | Sharpen your skills with curated algorithmic challenges | صقل مهاراتك مع تحديات خوارزمية مختارة |
+| search | Search problems... | ابحث في المسائل... |
+| difficulty | Difficulty | الصعوبة |
+| category | Category | الفئة |
+| status | Status | الحالة |
+| all | All | الكل |
+| easy | Easy | سهل |
+| medium | Medium | متوسط |
+| hard | Hard | صعب |
+| notStarted | Not Started | لم تبدأ |
+| solved | Solved | تم الحل |
+| attempted | Attempted | تمت المحاولة |
+| acceptanceRate | Acceptance Rate | نسبة القبول |
+| noResults | No problems found matching your criteria | لا توجد مسائل تطابق معاييرك |
+| clearFilters | Clear Filters | مسح الفلاتر |
+
+### Problem View
+| Key | EN | AR |
+|---|---|---|
+| description | Description | الوصف |
+| editor | Editor | المحرر |
+| runCode | Run Code | تشغيل الكود |
+| submit | Submit | إرسال |
+| console | Console | وحدة التحكم |
+| selectLanguage | Select Language | اختر اللغة |
+| examples | Examples | الأمثلة |
+| constraints | Constraints | القيود |
+| relatedTags | Related Tags | الوسوم ذات الصلة |
+| input | Input | المدخل |
+| output | Output | المخرج |
+| explanation | Explanation | الشرح |
+| noOutput | No output yet. Run your code to see results. | لا يوجد مخرج بعد. شغّل الكود لرؤية النتائج. |
+| submitSuccess | All test cases passed! ✓ | جميع حالات الاختبار نجحت! ✓ |
+| submitFail | Some test cases failed. Try again. | بعض حالات الاختبار فشلت. حاول مرة أخرى. |
+| runtime | Runtime | وقت التنفيذ |
+| memory | Memory | الذاكرة |
+| submissions | Submissions | الحلول المقدمة |
+
+### Leaderboard
+| Key | EN | AR |
+|---|---|---|
+| title | Leaderboard | لوحة المتصدرين |
+| rank | Rank | الترتيب |
+| user | User | المستخدم |
+| problemsSolved | Solved | المحلولة |
+| points | Points | النقاط |
+| successRate | Success Rate | نسبة النجاح |
+| totalSubmissions | Submissions | المحاولات |
+| bestRuntime | Best Time | أفضل وقت |
+| you | You | أنت |
+| noData | No submissions yet. Solve some problems to appear on the leaderboard! | لا توجد محاولات بعد. حل بعض المشاكل لتظهر في لوحة المتصدرين! |
+| topPerformers | Top Performers | أفضل المشاركين |
+| yourRank | Your Rank | ترتيبك |
+
+### Form Validation Messages
+| Key | EN | AR |
+|---|---|---|
+| invalidEmail | Please enter a valid email address | يرجى إدخال عنوان بريد إلكتروني صالح |
+| passwordRequired | Password is required | كلمة المرور مطلوبة |
+| passwordMinLength | Password must be at least 6 characters | يجب أن تكون كلمة المرور 6 أحرف على الأقل |
+| invalidCredentials | Invalid email or password | البريد الإلكتروني أو كلمة المرور غير صحيحة |
+| nameRequired | Name is required | الاسم مطلوب |
+| passwordMismatch | Passwords do not match | كلمات المرور غير متطابقة |
 
 ---
 
