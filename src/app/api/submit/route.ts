@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeCode, SUPPORTED_LANGUAGES } from '@/lib/judge0';
 import { db } from '@/lib/db';
+import { checkRateLimit, submitLimiter } from '@/lib/rate-limit';
 
 interface TestCaseResult {
   input: string;
@@ -11,6 +12,16 @@ interface TestCaseResult {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting (10 req/min per IP)
+    const ip = request.headers.get('x-forwarded-for') || 'anonymous';
+    const rateLimitResult = await checkRateLimit(submitLimiter, ip);
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many submissions. Please wait a moment.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { code, language, problemId, userId } = body;
 
@@ -40,11 +51,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse testCases from JSON string
-    let testCases: { input: string; output: string }[] = [];
+    // Seed stores test cases as { input, expectedOutput } — NOT { input, output }
+    let testCases: { input: string; expectedOutput: string }[] = [];
     try {
       testCases = typeof problem.testCases === 'string'
         ? JSON.parse(problem.testCases)
-        : (problem.testCases as { input: string; output: string }[] || []);
+        : (problem.testCases as { input: string; expectedOutput: string }[] || []);
     } catch {
       testCases = [];
     }
@@ -60,33 +72,49 @@ export async function POST(request: NextRequest) {
       try {
         const result = await executeCode(code, language, testCase.input);
 
-        // Check for compilation or runtime errors
+        // Judge0 CE status codes:
+        //   3 = Accepted, 4 = Wrong Answer — both need output comparison
+        //   5 = Time Limit Exceeded
+        //   6 = Compilation Error
+        //   7+ = Runtime Errors (SIGSEGV, SIGXFSZ, etc.)
         if (result.statusCode === 6) {
           // Compilation error
           hasError = true;
           errorType = 'Compilation Error';
           results.push({
             input: testCase.input,
-            expected: testCase.output,
+            expected: testCase.expectedOutput,
             actual: result.compileOutput || result.stderr || 'Compilation failed',
             passed: false,
           });
           break;
-        } else if (result.statusCode !== 0 && result.statusCode !== 1) {
-          // Runtime error
+        } else if (result.statusCode === 5) {
+          // Time Limit Exceeded
+          hasError = true;
+          errorType = 'Time Limit Exceeded';
+          results.push({
+            input: testCase.input,
+            expected: testCase.expectedOutput,
+            actual: result.stderr || result.statusDescription || 'Time limit exceeded',
+            passed: false,
+          });
+          break;
+        } else if (result.statusCode >= 7) {
+          // Runtime errors (SIGSEGV, SIGXFSZ, etc.)
           hasError = true;
           errorType = 'Runtime Error';
           results.push({
             input: testCase.input,
-            expected: testCase.output,
+            expected: testCase.expectedOutput,
             actual: result.stderr || result.statusDescription || 'Runtime error',
             passed: false,
           });
           break;
         }
+        // Status 3 (Accepted) or 4 (Wrong Answer) → compare output below
 
         const actual = (result.stdout || '').trim();
-        const expected = testCase.output.trim();
+        const expected = testCase.expectedOutput.trim();
         const passed = actual === expected;
 
         results.push({
@@ -110,7 +138,7 @@ export async function POST(request: NextRequest) {
         errorType = errorType || 'Runtime Error';
         results.push({
           input: testCase.input,
-          expected: testCase.output,
+          expected: testCase.expectedOutput,
           actual: execError instanceof Error ? execError.message : 'Execution failed',
           passed: false,
         });

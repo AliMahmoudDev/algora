@@ -71,6 +71,9 @@
 | **Charts** | Recharts v2.15 | Data visualization (installed, for future use) |
 | **Animation** | Framer Motion 12 | Installed for future use |
 | **Hosting** | Vercel | Production deployment, auto-deploy on push to main |
+| **AI Hints** | Google Gemini 2.5 Flash | Free tier (10 RPM), bilingual code hints |
+| **Rate Limiting** | Upstash Ratelimit + Redis | Free tier (500K/month), HTTP-based serverless |
+| **Error Tracking** | Sentry (`@sentry/nextjs`) | Free tier (5K errors/month) |
 
 ---
 
@@ -174,6 +177,7 @@ algora/
 │   │   ├── auth-client.ts             # Client-side auth re-exports
 │   │   ├── db.ts                      # Prisma client singleton (globalThis cached)
 │   │   ├── judge0.ts                  # Judge0 CE code execution engine
+│   │   ├── rate-limit.ts              # Upstash Ratelimit (execute: 20/min, submit: 10/min, ai-hint: 5/min)
 │   │   ├── supabase/
 │   │   │   ├── client.ts              # Supabase browser client (legacy)
 │   │   │   └── server.ts              # Supabase server client (legacy)
@@ -293,7 +297,8 @@ All API routes are under `src/app/api/`. Response format: `{ data: ... }` for su
 | `/api/auth/signup` | POST | None | Create user (name, email, password) |
 | `/api/problems` | GET | None | List all / get by `?id=` or `?slug=` |
 | `/api/execute` | POST | None | Run code with custom stdin (Run button) |
-| `/api/submit` | POST | Optional | Submit against all test cases, save to DB |
+| `/api/submit` | POST | Optional | Submit against all test cases, save to DB (rate limited: 10/min) |
+| `/api/ai-hint` | POST | None | AI-powered code hint via Gemini (rate limited: 5/min) |
 | `/api/submissions` | GET | Required (userId) | User submission history |
 | `/api/user-problems` | GET | Required (userId) | User's problem statuses |
 | `/api/profile` | GET/PATCH | Required (userId) | Get profile / Update bio |
@@ -1156,31 +1161,69 @@ SQLite is ephemeral on Vercel — the DB file is wiped on each deployment. For p
 
 ---
 
-## Future Ideas & Roadmap
+## Development Roadmap
 
-### Short-Term (Next 1-2 months)
+### Phase 0: Bug Fixes (DONE — Jun 11, 2026)
+- [x] Fix Submit Bug #1: Judge0 status code check was treating Accepted(3) and Wrong Answer(4) as Runtime Error
+- [x] Fix Submit Bug #2: testCases field name mismatch (seed stores `expectedOutput`, submit read `output`)
+- [x] Fix db.ts: Query logging only in development (was always-on)
+
+### Phase 1: Core Infrastructure (DONE — Jun 11, 2026)
+- [x] Install `@sentry/nextjs` for production error tracking (needs SENTRY_DSN env var)
+- [x] Install `@upstash/ratelimit` + `@upstash/redis` for API rate limiting (needs UPSTASH env vars)
+- [x] Install `@google/generative-ai` for Gemini API AI hints (needs GEMINI_API_KEY env var)
+- [x] Create `src/lib/rate-limit.ts` — rate limiter utility (execute: 20/min, submit: 10/min, ai-hint: 5/min)
+- [x] Create `src/app/api/ai-hint/route.ts` — POST endpoint for AI code hints
+- [x] Add rate limiting to `/api/execute` and `/api/submit`
+- [x] Update `.env.local.example` with all new env vars
+
+### Phase 2: Features (Next)
 1. **Admin Panel** — UI for CRUD operations on problems (add, edit, delete, toggle published)
 2. **More Problems** — Expand from 14 to 50+ problems across all difficulties
-3. **SEO** — Open Graph, Twitter cards, sitemap (exists), structured data, per-page metadata
-
-### Medium-Term (3-6 months)
-4. **AI Hints System** — LLM-powered hints when user is stuck (using z-ai-web-dev-sdk or similar)
+3. **SEO** — Open Graph, Twitter cards, structured data (JSON-LD), per-page `generateMetadata`
+4. **AI Hints UI** — "Get Hint" button in problem view page that calls `/api/ai-hint`
 5. **Editorial Solutions** — Expert-written solution explanations in Arabic and English
-6. **Achievements/Badges** — Milestone badges (first solve, 7-day streak, all-easy, etc.)
-7. **Contest Mode** — Timed competitions with live leaderboard updates
-8. **Custom Domain** — Configure `algora.dev` on Vercel
 
-### Long-Term (6-12 months)
-9. **Community Discussions** — Problem discussion threads, user comments
-10. **Video Editorials** — Embedded video explanations for select problems
-11. **Pair Programming** — Real-time collaborative code editor (WebSocket)
-12. **Mobile App** — React Native or PWA for practicing on mobile
-13. **Export to Resume** — Generate PDF summary of solved problems and ranking
-14. **Database Migration** — Migrate from SQLite to PostgreSQL (Supabase or Vercel Postgres)
-15. **Notification System** — Email/webhook notifications for contest starts, new problems
-16. **Problem Bookmarking** — Save problems for later
-17. **Code Templates** — User-created code snippets/templates
-18. **Dark/Light Theme Toggle** — If community requests it (currently dark-only)
+### Phase 3: Scale & Analytics
+6. **Supabase PostgreSQL** — Migrate from SQLite for production persistence on Vercel
+7. **Upstash Redis** — Cache problems, leaderboard, AI hint responses
+8. **PostHog Analytics** — Track solve rates, language distribution, time-per-problem (1M events/month free)
+9. **Resend Email** — Welcome emails, contest notifications (3,000/month free)
+10. **Vitest + Playwright** — Unit tests + E2E tests for critical flows
+
+### Phase 4: Growth Features
+11. **Achievements/Badges** — Milestone badges (first solve, 7-day streak, all-easy, etc.)
+12. **Contest Mode** — Timed competitions with live leaderboard (Ably: 6M messages/month free)
+13. **Custom Domain** — Configure `algora.dev` on Vercel
+14. **Community Discussions** — Problem discussion threads, user comments
+15. **Judge0 Self-Host** — Self-host Judge0 for unlimited code executions
+
+
+### Phase 5: Long-Term
+16. **Video Editorials** — Embedded video explanations for select problems
+17. **Pair Programming** — Real-time collaborative code editor (WebSocket, Y.js)
+18. **Mobile App** — React Native or PWA for practicing on mobile
+19. **Export to Resume** — Generate PDF summary of solved problems and ranking
+20. **Notification System** — Email/webhook notifications for contest starts, new problems
+
+
+### Tools Installed (Free Tiers)
+| Tool | Package | Free Tier | Status | Needs |
+|---|---|---|---|---|
+| Sentry | `@sentry/nextjs` | 5K errors/month | Installed, needs setup | SENTRY_DSN, SENTRY_ORG, SENTRY_PROJECT |
+| Upstash Ratelimit | `@upstash/ratelimit` | 500K commands/month | Active on execute, submit, ai-hint | UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN |
+| Upstash Redis | `@upstash/redis` | 10K commands/day | Installed (dependency of ratelimit) | Same as above |
+| Gemini AI | `@google/generative-ai` | 10 RPM (Flash) | Active on /api/ai-hint | GEMINI_API_KEY |
+
+### Tools Planned (Not Yet Installed)
+| Tool | Free Tier | Priority | Benefit |
+|---|---|---|---|
+| PostHog | 1M events/month | Phase 3 | Analytics, feature flags, A/B testing, session replay |
+| Resend | 3,000 emails/month | Phase 3 | Welcome emails, contest notifications |
+| Vitest + Playwright | Free (open source) | Phase 3 | Unit tests + E2E tests |
+| Supabase PostgreSQL | 500 MB, unlimited requests | Phase 3 | Production database (replace SQLite) |
+| Ably | 6M messages/month | Phase 4 | Real-time contest leaderboard |
+| OpenRouter | Free models available | Phase 4 | Multi-model AI fallback |
 
 ---
 
